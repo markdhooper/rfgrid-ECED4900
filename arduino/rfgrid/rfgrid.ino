@@ -1,5 +1,19 @@
+/*****************************************************************************/
+/* Program Name:  rfgrid.ino  (https://github.com/markdhooper/rfgrid)        */
+/* Programmer:    Mark Hooper (https://github.com/markdhooper)               */
+/* Description:   This program is intended for use with an Arduino UNO       */
+/*                microcontroller connected via usb to a host machine        */
+/*                running a python script at the repository linked above.    */
+/*                You will also require an rfgridShield and at least one     */
+/*                rfgrid modular array unit. For more information, please    */
+/*                see the github repo linked above.                          */
+/* Behavior:      This sketch will determine how many readers are connected. */
+/*                and will inform the host machine when it detects an rfid   */
+/*                tag. The current protocol is only 1-way at present.        */
+/*****************************************************************************/
+
 #include <SPI.h>
-#include <MFRC522.h>
+#include <MFRC522.h> //https://github.com/miguelbalboa/rfid
 
 /*****************************************************************************/
 /* Constants */
@@ -130,7 +144,8 @@ void sendUpdate(uint8_t addr, uint32_t ID){
   addrToXY(addr,msg[5],msg[6]);
   #if DEBUG
     char buf[22];
-    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
+    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
+                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
     Serial.println(buf);
   #else
     Serial.write(msg,UPDATE_MSG_SZ);

@@ -1,4 +1,4 @@
-# Interactive2DGridPeripheral
+# rfgrid
 A modular RFID based 2D grid that can detect objects equipped with RFID tags which incorporates a pico projector display.
 
 This will be our project as part of ECED4900 - Senior Year Project course at Dalhousie University.

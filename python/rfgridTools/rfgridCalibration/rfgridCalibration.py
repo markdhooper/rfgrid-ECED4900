@@ -76,8 +76,8 @@ class Grid():
 		self.bg = pygame.image.load(bg_img)			# the background image
 		
 		# the scale rect is used to allign the background image to our gridlines
-		# by right-clicking and draging the mouse from the top-left corner 
-		# to the bottom-right corner of a single tile
+		# by left-clicking and draging the mouse from the top-left corner 
+		# to the bottom-right corner of a set of 3x3 tiles.
 		self.scaleRect = pygame.rect.Rect(x0,y0,x1//x_tiles,y1//y_tiles) 
 		self.scaleRect_draging = False				# flags used when resizing
 		self.scaleRect_dragged = True
@@ -200,63 +200,66 @@ class Grid():
 #######################################################################
 rfgridInit(1600,900,True,8,8)
 done = False
-CALIBRATION_STEP = 1
+CALIBRATION_STEP = 0
 
 while not done:
 	for event in pygame.event.get():
-		# IF USER CLOSES THE WINDOW
-		if event.type == pygame.QUIT:
+		
+		if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+			# User has closed the pygame window or pressed 'ESC'
 			done=True
 		
-		# ESCAPE KEYPRESS
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-			done=True
-
-		if CALIBRATION_STEP == 2:
-			#MOUSE PRESSED
-			if event.type == pygame.MOUSEBUTTONDOWN:
-				x, y = event.pos
-				if event.button == 1:
-					GRID.resizeStart(x,y)
-					GRID.drawGrid()
-				elif event.button == 3:
-					GRID.scaleStart(x,y)
-					GRID.drawGrid()
-					
-			#MOUSE RELEASED
-			elif event.type == pygame.MOUSEBUTTONUP:
-				if event.button == 1:
-					GRID.resizeEnd()
-					GRID.updateMenu("Step 2:\nRight-Click and drag from the top-left to bottom-right of a 3x3 section of squares on the background image to scale the background to the detection zones of RFGRID device")
-					GRID.drawGrid()
-				elif event.button == 3:
-					GRID.scaleEnd()
-					GRID.updateMenu("Step 3:\nUse the arrow keys pan the map to the desired starting location and press \'ENTER\'.")
-					GRID.drawGrid()
-					CALIBRATION_STEP = 4
-			
-			#MOUSE MOVEMENT
-			elif event.type == pygame.MOUSEMOTION:
-				x, y = event.pos
-				if GRID.gridRect_draging:
-					GRID.updateGridRect(x,y)
-					GRID.drawGrid()
-				elif GRID.scaleRect_draging:
-					GRID.updateScaleRect(x,y)
-		
-		# 'Enter' KEYPRESS
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-			if(CALIBRATION_STEP == 1):
+		if CALIBRATION_STEP == 0:
+			# Welcome Screen
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+				# Enter Keypress
 				GRID.updateMenu("Step 1:\nLeft-Click and drag from the top-left to bottom-right of the projection surface")
 				GRID.drawGrid()
-				CALIBRATION_STEP = 2
-			elif(CALIBRATION_STEP == 4):
-				GRID.updateMenu("Calibration complete\npress \'s\' to SAVE and EXIT,\nor press \'r\' to RE-CALIBRATE")
+				CALIBRATION_STEP = 1
+				
+		elif CALIBRATION_STEP == 1:
+			# Aligmnment with projection surface
+			if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+				# User has clicked the top left corner of their device's projection surface
+				x, y = event.pos
+				GRID.resizeStart(x,y)
 				GRID.drawGrid()
-				CALIBRATION_STEP = 5
-		
-		if CALIBRATION_STEP == 4:
-			# ARROW KEYPRESSES
+			elif (event.type == pygame.MOUSEMOTION) and GRID.gridRect_draging:
+				# User is dragging the mouse toward the bottom right corner
+				# of their device's projection surface
+				x, y = event.pos
+				GRID.updateGridRect(x,y)
+				GRID.drawGrid()
+			elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
+				# User has released the left-click button, save state and move on to step 3
+				GRID.resizeEnd()
+				GRID.updateMenu("Step 2:\nLeft-Click and drag from the top-left to bottom-right of a 3x3 section of squares on the background image to scale the background to the detection zones of RFGRID device")
+				GRID.drawGrid()
+				CALIBRATION_STEP = 2
+				
+		elif CALIBRATION_STEP == 2:
+			# Scaling the bagkground image to match the physical location of the rfgrid device's
+			# array of RFID readers		
+			if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+				# User has clicked on the top left corner of a 3x3 set of tiles on the bagkground image
+				x, y = event.pos
+				GRID.scaleStart(x,y)
+				GRID.drawGrid()
+			elif (event.type == pygame.MOUSEMOTION) and GRID.scaleRect_draging:
+				# User is dragging the mouse to toward the bottom-right corner of a 
+				# 3x3 set of tiles on the background image
+				x, y = event.pos
+				GRID.updateScaleRect(x,y)
+			elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
+				# User has released the left mouse button. Rescale the bagkground image
+				# to match, and move to step 3
+				GRID.scaleEnd()
+				GRID.updateMenu("Step 3:\nUse the arrow keys pan the map to the desired starting location and press \'ENTER\'.")
+				GRID.drawGrid()
+				CALIBRATION_STEP = 3
+			
+		elif CALIBRATION_STEP == 3:
+			# Moving the viewport of the background image with the arrow keys
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
 				GRID.scrollGrid(-1,0)
 			elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
@@ -265,15 +268,25 @@ while not done:
 				GRID.scrollGrid(0,+1)
 			elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
 				GRID.scrollGrid(0,-1)
-		
-		if CALIBRATION_STEP == 5:
-			# 'r' keypress
+			elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+				# User has chosen the desired starting location move to step 4
+				GRID.updateMenu("Calibration complete\npress \'s\' to SAVE and EXIT,\nor press \'r\' to RE-CALIBRATE")
+				GRID.drawGrid()
+				CALIBRATION_STEP = 4
+				
+		elif CALIBRATION_STEP == 4:
+			# Saving the configuration, or re-calibrating.
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-				CALIBRATION_STEP = 1
+				# User wants to re-calibrate 
+				CALIBRATION_STEP = 0
 				GRID = Grid(256,768,191,573,8,8,'bg.jpg')
 				GRID.drawGrid()
-			# 's' keypress
 			elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+				# User wants to save the configuration. 
+				# ***This will need to be modified to output
+				#    to a file. With a name and location specified by the user.
+				#    this will need to be added once we determine the best 
+				#    format to go with. ***
 				print(GRID.surface.get_width())
 				print(GRID.surface.get_height())
 				print(GRID.x0)
@@ -298,7 +311,6 @@ while not done:
 				print(GRID.gridRect.height)
 				print(GRID.gridRect.x)
 				print(GRID.gridRect.y)
-				
 				done = True
 	
 	clock.tick(30)

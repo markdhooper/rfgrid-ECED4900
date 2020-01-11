@@ -2,11 +2,12 @@ import pygame
 import ptext
 import sys
 import os
-import argparse
-
-
 
 scriptDir = os.path.dirname('__file__')
+bg_filename = ""
+bg_config = ""
+configDir = ""
+
 if len(sys.argv) == 1:
 	print(
 		"error: filename for background not provided.\n" +
@@ -16,7 +17,14 @@ if len(sys.argv) == 1:
 else:
 	bg_filename = "./images/backgrounds/" + sys.argv[1]
 	bg_filename = os.path.join(scriptDir, bg_filename)
-	if not os.path.isfile(bg_filename):
+	if os.path.isfile(bg_filename):
+		configDir = os.path.join(scriptDir,"./configs/")
+		if not os.path.isdir(configDir):
+			os.mkdir("configs")
+		bg_config, ext = os.path.splitext((sys.argv[1]))
+		bg_config = open(configDir + bg_config + ".rfgridbg", "w+")
+		grid_config = open(configDir + "grid.rfgrid","w+")
+	else:
 		print("error: cannot find file " + bg_filename)
 		exit()
 
@@ -46,7 +54,7 @@ def rfgridInit(
 		SCR = pygame.display.set_mode((scr_w,scr_h), pygame.RESIZABLE)
 		
 	#set up the grid
-	GRID = Grid(x0,x1,y0,y1,x_tiles,y_tiles, bg_img)
+	GRID = Grid(x0,y0,x1,y1,x_tiles,y_tiles, bg_img)
 	GRID.drawGrid()
 
 	#save a copy of the original background image
@@ -60,7 +68,7 @@ def initTiles(x_tiles,y_tiles):
     return tiles
 
 class Grid():
-	def __init__(self, x0, x1, y0, y1, x_tiles, y_tiles, bg_img):
+	def __init__(self, x0, y0, x1, y1, x_tiles, y_tiles, bg_img):
 		self.surface = pygame.Surface((int(x1-x0),int(y1-y0)))
 		######################################################
 		# POSITION
@@ -297,38 +305,28 @@ while not done:
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
 				# User wants to re-calibrate 
 				CALIBRATION_STEP = 0
-				GRID = Grid(256,768,191,573,8,8,'bg.jpg')
+				GRID = Grid(450,350,950,800,8,8,bg_filename)
 				GRID.drawGrid()
 			elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-				# User wants to save the configuration. 
-				# ***This will need to be modified to output
-				#    to a file. With a name and location specified by the user.
-				#    this will need to be added once we determine the best 
-				#    format to go with. ***
-				print(GRID.surface.get_width())
-				print(GRID.surface.get_height())
-				print(GRID.x0)
-				print(GRID.y0)
-				print(GRID.x1)
-				print(GRID.y1)
-				print(GRID.x_scale)
-				print(GRID.y_scale)
-				print(GRID.bg_offset_x)
-				print(GRID.bg_offset_y)
-				print(GRID.bg.get_width())
-				print(GRID.bg.get_height())
-				print(SCR.get_width())
-				print(SCR.get_height())
-				print(BG.get_width())
-				print(BG.get_height())
-				print(GRID.x_step)
-				print(GRID.y_step)
-				print(GRID.scaleRect.width)
-				print(GRID.scaleRect.height)
-				print(GRID.gridRect.width)
-				print(GRID.gridRect.height)
-				print(GRID.gridRect.x)
-				print(GRID.gridRect.y)
+				# save background configuration file
+				bg_config.write("bg_filename=%s\n" % bg_filename)
+				bg_config.write("bg_w=%d\n" % GRID.bg.get_width())
+				bg_config.write("bg_h=%d\n" % GRID.bg.get_height())
+				bg_config.write("bg_ofs_x=%d\n" % GRID.bg_offset_x)
+				bg_config.write("bg_ofs_y=%d" % GRID.bg_offset_y)
+				bg_config.close()
+				
+				#save grid configuration file
+				grid_config.write("scr_w=%d\n" % SCR.get_width())
+				grid_config.write("scr_h=%d\n" % SCR.get_height())
+				grid_config.write("g_w=%d\n" % GRID.surface.get_width())
+				grid_config.write("g_h=%d\n" % GRID.surface.get_height())
+				grid_config.write("g_x=%d\n" % GRID.x0)
+				grid_config.write("g_y=%d\n" % GRID.y0)
+				grid_config.write("g_x_step=%d\n" % GRID.x_step)
+				grid_config.write("g_y_step=%d" % GRID.y_step)
+				grid_config.close()
+				
 				done = True
 	
 	clock.tick(30)

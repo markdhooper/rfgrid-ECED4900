@@ -1,5 +1,24 @@
 import pygame
 import ptext
+import sys
+import os
+import argparse
+
+
+
+scriptDir = os.path.dirname('__file__')
+if len(sys.argv) == 1:
+	print(
+		"error: filename for background not provided.\n" +
+		"\tplease provide the name of the desired background image in the /images/backgrounds folder."
+		) 
+	exit()
+else:
+	bg_filename = "./images/backgrounds/" + sys.argv[1]
+	bg_filename = os.path.join(scriptDir, bg_filename)
+	if not os.path.isfile(bg_filename):
+		print("error: cannot find file " + bg_filename)
+		exit()
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -7,10 +26,9 @@ pygame.mixer.init()
 clock = pygame.time.Clock()
 
 def rfgridInit(
-	scr_w = 1024, scr_h = 728, fullScreen = False, 
-	x_tiles = 8, y_tiles = 8,
-	x0 = 256, x1 = 768 , y0 = 191 , y1 = 573,
-	bg_img = 'bg.jpg'  #CHANGE THIS LATER & ADD ERROR CHECKING
+	bg_img, scr_w = 1024, scr_h = 728, 
+	fullScreen = False, x_tiles = 8, y_tiles = 8, 
+	x0 = 256, y0 = 191, x1 = 768, y1 = 573
 	):
 	
 	#declare globals
@@ -198,7 +216,7 @@ class Grid():
 #######################################################################
 # Beginning of Calibration Loop
 #######################################################################
-rfgridInit(1600,900,True,8,8)
+rfgridInit(bg_filename,1600,900,True,8,8,450,350,950,800)
 done = False
 CALIBRATION_STEP = 0
 

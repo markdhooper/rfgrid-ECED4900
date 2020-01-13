@@ -113,7 +113,14 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 	rfgrid = Grid(grid_args,bg_args)
 	rfgrid.draw()
 	return rfgrid
-	
+
+def createTiles(x_dim,y_dim):
+    tiles = {}
+    for x in range(0, x_dim):
+        for y in range(0,y_dim):
+            tiles[x,y] = 0
+    return tiles
+
 class Grid():
 	def __init__(self, grid_args, bg_args):
 		global screen
@@ -190,12 +197,19 @@ class Grid():
 		self.grid_x_tiles = g_x_tiles
 		self.grid_y_tiles = g_y_tiles
 		
+		# Create a tile matrix corresponding to the size of the background
+		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
+		#this will be the surface on which game objects will be drawn
+
 		# setup the pygame screen
 		screen = pygame.display.set_mode((scr_w,scr_h), pygame.FULLSCREEN)
 		
 		# make the surfaces
 		self.grid_surf = pygame.Surface((g_w, g_h))
 		self.bg_surf = pygame.transform.smoothscale(pygame.image.load(bg_filename),(bg_w,bg_h))
+		self.game_surf = (pygame.Surface((self.bg_surf.get_width(), self.bg_surf.get_height()))).convert_alpha()
+		self.game_surf.set_alpha(100)
+		self.game_surf.fill((100,100,100,10))
 		self.menu_surf = pygame.Surface((g_w, 2*g_y_step))
 		self.menu_text_surf, self.menu_text_pos = ptext.draw(
 			self.menu_str, 
@@ -210,12 +224,25 @@ class Grid():
 	def draw(self):
 		global screen
 		self.grid_surf.blit(self.bg_surf,(self.bg_ofs_x, self.bg_ofs_y))
+		self.grid_surf.blit(self.game_surf,((self.bg_ofs_x, self.bg_ofs_y)))
 		self.menu_surf.fill(self.menu_bg_color)
 		self.menu_surf.blit(self.menu_text_surf,self.menu_text_pos)
 		screen.fill((0,0,0))
 		screen.blit(self.grid_surf,(self.grid_x, self.grid_y))
 		screen.blit(self.menu_surf,(self.menu_x, self.menu_y))
 		pygame.display.flip()
+
+	#Draws using absolute x and y coordinates
+	def drawGame(self, game_x, game_y, surf):
+		if (game_x <= self.bg_x_tiles) and (game_y <= self.bg_y_tiles):
+			self.game_surf.blit(surf, (game_x*self.grid_x_step,game_y*self.grid_y_step))
+			self.draw()
+
+	#Draws using x and y grid coordinates
+	def drawGrid(self, grid_x, grid_y, surf):
+		if (grid_x <= self.grid_x_tiles) and (grid_y <= self.grid_y_tiles):
+			self.game_surf.blit(surf, ((grid_x*self.grid_x_step)-self.bg_ofs_x,(grid_y*self.grid_y_step)-self.bg_ofs_y))
+			self.draw()
 			
 	def scrollBackground(self,dx,dy):
 		x_test = self.bg_ofs_x + dx*self.grid_x_step

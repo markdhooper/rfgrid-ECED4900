@@ -1,5 +1,7 @@
 bg_filename=./images/backgrounds/pit1.jpg
-bg_w=1757
-bg_h=2400
+bg_w=1760
+bg_h=2404
 bg_ofs_x=0
 bg_ofs_y=-1760
+bg_x_tiles=22
+bg_y_tiles=30

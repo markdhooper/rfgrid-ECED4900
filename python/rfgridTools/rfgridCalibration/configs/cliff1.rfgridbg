@@ -1,5 +1,7 @@
 bg_filename=./images/backgrounds/cliff1.jpg
 bg_w=2000
-bg_h=1612
-bg_ofs_x=-960
+bg_h=1602
+bg_ofs_x=-1120
 bg_ofs_y=0
+bg_x_tiles=25
+bg_y_tiles=20

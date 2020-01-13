@@ -3,3 +3,5 @@ bg_w=1920
 bg_h=2884
 bg_ofs_x=0
 bg_ofs_y=0
+bg_x_tiles=24
+bg_y_tiles=36

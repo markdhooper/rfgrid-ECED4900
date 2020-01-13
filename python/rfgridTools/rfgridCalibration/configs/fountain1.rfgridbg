@@ -1,5 +1,7 @@
 bg_filename=./images/backgrounds/fountain1.jpg
 bg_w=1600
-bg_h=1608
-bg_ofs_x=-480
+bg_h=1602
+bg_ofs_x=0
 bg_ofs_y=0
+bg_x_tiles=20
+bg_y_tiles=20

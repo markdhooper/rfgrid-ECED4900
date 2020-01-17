@@ -1,8 +1,8 @@
 from rfgrid import *
 import numpy
 
-rfgrid = rfgridInit(bg_config_name = "./configs/pit1.rfgridbg")
-rfgrid.updateMenu("Application Test",100,(255,0,128),(255,255,255))
+rfgrid = rfgridInit(bg_config_name = "./configs/interior1.rfgridbg")
+rfgrid.updateMenu("hello world",100,(255,0,128),(100,100,100))
 done = False
 
 while not done:

@@ -1,38 +1,72 @@
+# Add this later, simply process all background images in the background folder one at a time.
+# os.chdir("./images/backgrounds/")
+# for file in glob.glob("*.jpg"):
+#	print(file)
+
+
 import pygame
 import ptext
 import sys
 import os
+import math
+import glob
 
+# Configure Pygame
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 pygame.mixer.init()
 clock = pygame.time.Clock()
+
+# Pygame related variables
 screen = None
 
+# Command line argument variables
 scriptDir = os.path.dirname('__file__')
 bg_filename = ""
 bg_config = ""
 configDir = ""
 
+# get command line arguments
 if len(sys.argv) == 1:
+	# User did not provide any arguments
 	print(
 		"error: filename for background not provided.\n" +
 		"\tplease provide the name of the desired background image in the /images/backgrounds folder."
 		) 
+	# close the application
 	exit()
 else:
+	# user provided an argument (the name of the background image that they want to scale)
 	bg_filename = "./images/backgrounds/" + sys.argv[1]
 	bg_filename = os.path.join(scriptDir, bg_filename)
 	if os.path.isfile(bg_filename):
+		# a file with the name provided by the user is in the ./images/backgrounds directory
 		configDir = os.path.join(scriptDir,"./configs/")
 		if not os.path.isdir(configDir):
+			# there is no config directory, create one
 			os.mkdir("configs")
+		# store the name of the background image file (without the file extension)
 		bg_config, ext = os.path.splitext((sys.argv[1]))
 	else:
+		# we were unable to locate an image matching the user's argument
+		# in the ./images/backgrounds folder
 		print("error: cannot find file " + bg_filename)
+		# close the application
 		exit()
 
 
+
+
+#################################################################################################
+# Function Name: rfgridInit
+# Description:
+# 	This function loads in the .rfgrid configuration file and the background image.
+#	It creates a Grid object using the parameters provided in the .rfgrid file
+#	to create an area on the screen that matches the play area on the rfgrid device. 
+#	if the .rfgrid file in the arguments provided does not exist or does not match the 
+#	format. Then the user needs to run the rfgrid display calibration tool (rfgridDispCalib.py).
+#	Which will create the file in the required format.
+#################################################################################################
 def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_filename = "./images/backgrounds/default.jpg"):
 	# layout of .rfgrid file
 	G_PARAM_MAX = 10
@@ -217,6 +251,7 @@ class Grid():
 	
 	def draw(self):
 		global screen
+		self.grid_surf.fill((0,0,0))
 		self.grid_surf.blit(self.bg_surf,(self.bg_ofs_x, self.bg_ofs_y))
 		self.menu_surf.fill(self.menu_bg_color)
 		self.menu_surf.blit(self.menu_text_surf,self.menu_text_pos)
@@ -228,9 +263,9 @@ class Grid():
 	def scrollBackground(self,dx,dy):
 		x_test = self.bg_ofs_x + dx*self.grid_x_step
 		y_test = self.bg_ofs_y + dy*self.grid_y_step
-		if (0 >= x_test) and (x_test >= -(self.bg_surf.get_width() - self.grid_x_tiles*self.grid_x_step)):
+		if ((self.grid_x_step//2) >= x_test) and (x_test >= -(self.bg_surf.get_width() - self.grid_x_tiles*self.grid_x_step)):
 			self.bg_ofs_x += dx*self.grid_x_step
-		if (0 >= y_test) and (y_test >= -(self.bg_surf.get_height() - self.grid_y_tiles*self.grid_y_step)):
+		if ((self.grid_y_step//2) >= y_test) and (y_test >= -(self.bg_surf.get_height() - self.grid_y_tiles*self.grid_y_step)):
 			self.bg_ofs_y += dy*self.grid_y_step
 		self.draw()
 	
@@ -251,95 +286,127 @@ class Grid():
 		self.draw()
 	
 	def scaleBackground(self):
+		#Load the backgroud image
 		self.bg_surf = pygame.image.load(self.bg_filename)
 		self.bg_ofs_x = 0
 		self.bg_ofs_y = 0
-		REL_DIVISOR_H = int(((self.bg_surf.get_height()*2)/(self.grid_surf.get_height()*1)))
-		REL_DIVISOR_W = int(((self.bg_surf.get_width()*2)/(self.grid_surf.get_width()*1)))
-		grid_tile_w = float(self.grid_w/self.grid_x_tiles)
-		grid_tile_h = float(self.grid_h/self.grid_y_tiles)
-		self.bg_surf = pygame.image.load(self.bg_filename)
-		selection = 0
-		msgStr = ( "Select a tile area:\n" +
-					"1:" + str(REL_DIVISOR_W) + "x" + str(REL_DIVISOR_H) + "\n" +
-					"2:" + str(REL_DIVISOR_W//2) + "x" + str(REL_DIVISOR_H//2) + "\n" +
-					"3:" + str(REL_DIVISOR_W*2) + "x" + str(REL_DIVISOR_H*2) + "\n" +
-					"4:" + str(REL_DIVISOR_W//3) + "x" + str(REL_DIVISOR_H//3) + "\n"
+		OPT_W = [2, 3, 4, 6, 10]
+		OPT_H = [2, 3, 4, 6, 10]
+		tile_count_w = 1
+		tile_count_h = 1
+		
+		
+		# allow user to select 
+		msgStr = ( "Choose a tile area to select (the bigger the better)\n" +
+					"1: " + str(OPT_W[0]) + " x " + str(OPT_H[0]) + "\n" +
+					"2: " + str(OPT_W[1]) + " x " + str(OPT_H[1]) + "\n" +
+					"3: " + str(OPT_W[2]) + " x " + str(OPT_H[2]) + "\n" +
+					"4: " + str(OPT_W[3]) + " x " + str(OPT_H[3]) + "\n" +
+					"5: " + str(OPT_W[4]) + " x " + str(OPT_H[4])
 				)
-		self.updateMenu(msgStr, txt_sz = 30)
+		self.updateMenu(msgStr, txt_sz = 25)
 		self.draw()
 		selection = False
+		
+		# wait for the user to select an option in the menu
 		while not selection:
 			for event in pygame.event.get():
-				if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
-					selection = True
-				elif event.type == pygame.KEYDOWN and event.key == pygame.K_2:
-					REL_DIVISOR_H=REL_DIVISOR_H//2
-					REL_DIVISOR_W=REL_DIVISOR_W//2
-					selection = True
-				elif event.type == pygame.KEYDOWN and event.key == pygame.K_3:
-					REL_DIVISOR_H=REL_DIVISOR_H*2
-					REL_DIVISOR_W=REL_DIVISOR_W*2
-					selection = True
-				elif event.type == pygame.KEYDOWN and event.key == pygame.K_4:
-					REL_DIVISOR_H=REL_DIVISOR_H//3
-					REL_DIVISOR_W=REL_DIVISOR_W//3
-					selection = True
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_1:
+						selection = True
+						tile_count_h=OPT_H[0]
+						tile_count_w=OPT_W[0]
+					elif event.key == pygame.K_2:
+						selection = True
+						tile_count_h=OPT_H[1]
+						tile_count_w=OPT_W[1]
+					elif event.key == pygame.K_3:
+						selection = True
+						tile_count_h=OPT_H[2]
+						tile_count_w=OPT_W[2]
+					elif event.key == pygame.K_4:
+						selection = True
+						tile_count_h=OPT_H[3]
+						tile_count_w=OPT_W[3]
+					elif event.key == pygame.K_5:
+						selection = True
+						tile_count_h=OPT_H[4]
+						tile_count_w=OPT_W[4]
 			clock.tick(30)
-		
+			
+		# update the instructions for the user
 		msgStr = (	"Drag the cursor to highlight a " + 
-					str(REL_DIVISOR_W) + "x" + str(REL_DIVISOR_H) +
-					"section of tiles"
+					str(tile_count_w) + " x " + str(tile_count_h) +
+					" section of tiles in the background"
 				)
 		self.updateMenu(msgStr, txt_sz = 30)
 		self.draw()
+		
+		
+		# Now we can let the user use the mouse to select a tile area
 		scale_done = False
 		x0,y0,x1,y1 = 0,0,1,1
 		scale_moving = False
 		scale_valid = False
-		scale_rect = pygame.rect.Rect(x0,y0,x1,y1)	
+		scale_rect = pygame.rect.Rect(x0,y0,x1,y1)
+		scale_color = ((255,255,255))
+		inner_color = ((255,100,100))
+		
 		while not scale_done:
 			for event in pygame.event.get():
 				if (event.type == pygame.MOUSEBUTTONDOWN) and (event.button == 1):
+					# user has clicked on the top left corner of a group of tiles
 					if scale_moving == False:
 						scale_rect.x, scale_rect.y = event.pos
 						scale_rect.w = 1
 						scale_rect.h = 1
 					scale_moving = True
 					self.draw()
+					
 				elif (event.type == pygame.MOUSEMOTION) and scale_moving:
 					x, y = event.pos
-					if((x > scale_rect.x + 5) and (y > scale_rect.y + 5)):
+					if((x > scale_rect.x + 10) and (y > scale_rect.y + 10)):
+						# user is intentionally dragging the mouse cursor
 						scale_valid = True
 						scale_rect.width = x - scale_rect.x
 						scale_rect.height = y - scale_rect.y
+						scale_rect_ratio = round((scale_rect.width/scale_rect.height),3)
+						target_ratio = round((tile_count_w/tile_count_h),3)
+						
+						#clear the previous rectangle
 						self.draw()
-						x_inc = int(round(scale_rect.width/REL_DIVISOR_W))
-						y_inc = int(round(scale_rect.height/REL_DIVISOR_H))
-						innerRect = pygame.rect.Rect(scale_rect.x,scale_rect.y,x_inc,y_inc)
-
-						for i in range (0,REL_DIVISOR_W):
-							for j in range (0,REL_DIVISOR_H):
-								pygame.draw.rect(screen, (200,128,128), innerRect, 1)
-								innerRect.y = innerRect.y + y_inc
-							innerRect.x = int(innerRect.x + x_inc)
-							innerRect.y = int(innerRect.y - REL_DIVISOR_H*y_inc)
-						pygame.draw.rect(screen, (255,255,255), scale_rect, 3)
+						
+						if scale_rect_ratio == target_ratio:
+							inner_color = ((80,255,80))
+							x_inc = int(scale_rect.width/tile_count_w)
+							y_inc = int(scale_rect.height/tile_count_h)
+							innerRect = pygame.rect.Rect(scale_rect.x+4,scale_rect.y+4,x_inc-tile_count_w,y_inc-tile_count_h)
+							for i in range (0,tile_count_w):
+								for j in range (0,tile_count_h):
+									pygame.draw.rect(screen, inner_color, innerRect, 2)
+									innerRect.y = int(innerRect.y + y_inc)
+								innerRect.x = int(innerRect.x + x_inc)
+								innerRect.y = int(innerRect.y - tile_count_h*y_inc)
+							
+						pygame.draw.rect(screen, scale_color, scale_rect, 2)
 						pygame.display.flip()
 						
 				elif (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
 					scale_moving = False
 					if scale_valid:
+						# user didn't mis-click
 						scale_valid = False
-						bg_tile_w = float(scale_rect.width/REL_DIVISOR_W)
-						bg_tile_h = float(scale_rect.height/REL_DIVISOR_H)
-						self.bg_x_tiles = round(self.bg_surf.get_width()/bg_tile_w)
-						self.bg_y_tiles = round(self.bg_surf.get_height()/bg_tile_h)
-						horizontal_factor = ((self.grid_w)/self.grid_x_tiles)/(self.bg_surf.get_width()/self.bg_x_tiles)
-						vertical_factor = ((self.grid_h)/self.grid_y_tiles)/(self.bg_surf.get_height()/self.bg_y_tiles)
-						new_bg_width = int(round(self.bg_surf.get_width()*horizontal_factor))
-						new_bg_height = int(round(self.bg_surf.get_height()*vertical_factor))
+						bg_tile_w = float(scale_rect.width/tile_count_w)
+						bg_tile_h = float(scale_rect.height/tile_count_h)
+						self.bg_x_tiles = int(round(self.bg_surf.get_width()/bg_tile_w))
+						self.bg_y_tiles = int(round(self.bg_surf.get_height()/bg_tile_h))
+						new_bg_width = self.bg_x_tiles*self.grid_x_step
+						new_bg_height = self.bg_y_tiles*self.grid_y_step
 						self.bg_surf = pygame.transform.smoothscale(self.bg_surf,(new_bg_width,new_bg_height))
+						self.bg_ofs_x = -round((((new_bg_width/self.bg_x_tiles)*(self.grid_x_tiles))-self.grid_surf.get_width())/2)
+						self.bg_ofs_y = -round((((new_bg_height/self.bg_y_tiles)*(self.grid_y_tiles))-self.grid_surf.get_height())/2)
+						print(self.bg_ofs_x)
+						print(self.bg_ofs_y)
 						self.updateMenu("Scaling Complete:\n use the arrow keys to choose the starting position and press \'s\' to save or \'r\' to re-scale", txt_sz = 30)
 						scale_done = True
 			clock.tick(30)

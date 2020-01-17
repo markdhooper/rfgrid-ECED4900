@@ -269,3 +269,9 @@ class Grid():
 			)
 		self.draw()
 
+#class rfgridObject():
+#	def __init__(
+#		self, name = "empty", id = 0, 
+#		image = "./images/objects/blank.png", 
+#		en_sound = None, ex_sound = None, sub_sound = None,
+#		sz_x = 1, sz_y = 1, x_pos = 0, y_pos = 0, ):

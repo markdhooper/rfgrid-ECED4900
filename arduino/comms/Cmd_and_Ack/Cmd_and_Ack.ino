@@ -28,13 +28,18 @@
 #define A_SYNC  0x0F
 
 
-#define FALSE 0
-#define TRUE  1
+
 
 /* message sizes */
 #define UPDATE_MSG_SZ 7
 #define GETID_MSG_SZ  7
 #define GETXY_MSG_SZ  7
+
+/* diagnostic values */
+#define INVAL_COORD 255 // invalid x and y position
+
+#define FALSE 0
+#define TRUE  1
 
 /* Additional Constants */
 #define UPDATE_MSG_SZ 7
@@ -91,46 +96,26 @@ union data16{
 /*****************************************************************************/
 /* Global Variables */
 /*****************************************************************************/
-byte event = FALSE;
 uint8_t event_addr;
 uint32_t event_ID;
 struct Tile Tiles[READER_LIMIT];
 
 /*****************************************************************************/
-/* Functions */
+/* General Functions */
 /*****************************************************************************/
-void sendUpdate(uint8_t addr, uint32_t ID){
-  uint8_t msg[UPDATE_MSG_SZ];
-  msg[0] = A_UPDATE;
-  long_to_bytes(&msg[1], ID);
-  addrToXY(addr,msg[5],msg[6]);
-  #if DEBUG
-    char buf[22];
-    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
-                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
-    Serial.println(buf);
-  #else
-    Serial.write(msg,UPDATE_MSG_SZ);
-  #endif
-}
-
-void sendGetID(uint8_t x, uint8_t y){
-  uint8_t msg[GETID_MSG_SZ];
-  uint8_t addr;
-  
-  msg[0] = A_GETID;
-  XYToAddr(x, y, addr);
-  long_to_bytes(&msg[1], Tiles[addr].UID);
-  msg[5] = x;
-  msg[6] = y;
-  #if DEBUG
-    char buf[22];
-    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
-                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
-    Serial.println(buf);
-  #else
-    Serial.write(msg,GETID_MSG_SZ);
-  #endif
+int simplesearch(uint32_t ID, uint8_t &addr){
+  /* extremely simple search algorithm, can be 
+  replaced with something better later. Returns 1 
+  if object is found and -1 if not */
+  addr = 0;
+  uint8_t notfound = TRUE;
+  while(addr<READER_LIMIT){
+    if(ID == Tiles[addr].UID){
+      return TRUE;
+    }
+    addr++;
+  }
+  return FALSE;
 }
 
 /* converts byte array to 32bit long */
@@ -187,12 +172,73 @@ int addrToXY(uint8_t addr, uint8_t &x, uint8_t &y){
     return 0;    
 }
 
-void serialEvent(){
-  event = TRUE;
-  if(Serial.read() == P_GETID){
-    event = TRUE;
-    // parse message and accept acknowledgement
+/*****************************************************************************/
+/* Command Functions */
+/*****************************************************************************/
+void sendUpdate(uint8_t addr, uint32_t ID){
+  uint8_t msg[UPDATE_MSG_SZ];
+  msg[0] = A_UPDATE;
+  long_to_bytes(&msg[1], ID);
+  addrToXY(addr,msg[5],msg[6]);
+  #if DEBUG
+    char buf[22];
+    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
+                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
+    Serial.println(buf);
+  #else
+    Serial.write(msg,UPDATE_MSG_SZ);
+  #endif
+}
+
+void sendGetID(){
+  uint8_t msg[GETID_MSG_SZ];
+  uint8_t addr;
+  byte x = Serial.read();
+  byte y = Serial.read();
+  
+  msg[0] = A_GETID;
+  XYToAddr(x, y, addr);
+  long_to_bytes(&msg[1], Tiles[addr].UID);
+  msg[5] = x;
+  msg[6] = y;
+  #if DEBUG
+    char buf[22];
+    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
+                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
+    Serial.println(buf);
+  #else
+    Serial.write(msg,GETID_MSG_SZ);
+  #endif
+}
+
+void sendGetXY(){
+  uint8_t msg[GETID_MSG_SZ];
+  uint8_t addr;
+  uint8_t buf[4];
+  uint32_t ID;
+  /* read ID in big endian */
+  Serial.readBytes(buf, 4);
+  /* convert to lil endian for storage/use */
+  ID = bytes_to_long(buf);
+  
+  msg[0] = A_GETXY;
+  long_to_bytes(&msg[1], ID);
+  /* convert addr to x,y coord */
+  if(simplesearch(ID, addr) == TRUE){
+    addrToXY(addr,msg[5],msg[6]);
   }
+  else{
+    msg[5] = INVAL_COORD;
+    msg[6] = INVAL_COORD;
+  }
+  #if DEBUG
+    char buf[22];
+    sprintf(buf,"%.2x %.2x %.2x %.2x %.2x %.2x %.2x",
+                msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6]);
+    Serial.println(buf);
+  #else
+    Serial.write(msg,GETID_MSG_SZ);
+  #endif
 }
 
 /*****************************************************************************/
@@ -202,14 +248,29 @@ void setup() {
   Serial.begin(9600); // set the baud rate
   event_addr = 0x01;//0xFF&random(0xFF);
   event_ID = 0x01;//random(0xFFFFFFFF);
-  Tiles[1].UID = 0xFF;
+  Tiles[0].UID = 72;
 }
+uint8_t cnt = 0;
 void loop() {
-  if(event == TRUE){
-    byte x = Serial.read();
-    byte y = Serial.read();
-    sendGetID(x, y);
-    event = FALSE;
+  if(Serial.available()){
+    byte cmd = Serial.read();
+    parse_cmd(cmd);
   }
   delay(1000);
+}
+void parse_cmd(byte cmd){
+  switch(cmd){
+    case P_UPDATE:
+      // received ack from host, update outgoing mailbox (?)
+      break;
+    case P_GETID:
+      sendGetID();
+      break;
+    case P_GETXY:
+      sendGetXY();
+      break;
+    default:
+      Serial.write(cmd);
+      break;
+  }
 }

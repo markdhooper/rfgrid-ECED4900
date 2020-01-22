@@ -1,0 +1,16 @@
+8
+8
+11
+0,blank.png,blank.wav
+1513352194,0.png,0.wav
+1993009922,1.png,1.wav
+935914242,2.png,2.wav
+3452824322,3.png,3.wav
+3824020226,4.png,4.wav
+163375874,5.png,5.wav
+1322117890,6.png,6.wav
+3871206146,7.png,7.wav
+176352002,8.png,8.wav
+1952181250,9.png,battle1.wav
+bg.png
+bg.wav

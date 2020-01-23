@@ -22,35 +22,46 @@ screen = None
 
 # Command line argument variables
 scriptDir = os.path.dirname('__file__')
-bg_filename = ""
-bg_config = ""
+bg_filename = []
+bg_config = []
 configDir = ""
+bg_processed = 0
 
 # get command line arguments
 if len(sys.argv) == 1:
 	# User did not provide any arguments
-	print(
-		"error: filename for background not provided.\n" +
-		"\tplease provide the name of the desired background image in the /images/backgrounds folder."
-		) 
-	# close the application
-	exit()
+	configDir = os.path.join(scriptDir,"./configs/")
+	os.chdir("./images/backgrounds/")
+	for file in glob.glob("*.jpg"):
+		bg_filename.append(file)
+		f_name, ext = os.path.splitext((file))
+		bg_config.append(f_name)
+	os.chdir("..")
+	os.chdir("..")
+
+	#print(
+	#	"error: filename for background not provided.\n" +
+	#	"\tplease provide the name of the desired background image in the /images/backgrounds folder."
+	#	) 
+	## close the application
+	#exit()
 else:
 	# user provided an argument (the name of the background image that they want to scale)
-	bg_filename = "./images/backgrounds/" + sys.argv[1]
-	bg_filename = os.path.join(scriptDir, bg_filename)
-	if os.path.isfile(bg_filename):
+	bg_filename.append(str("./images/backgrounds/" + sys.argv[1]))
+	bg_filename[0] = os.path.join(scriptDir, str(bg_filename[0]))
+	if os.path.isfile(bg_filename[0]):
 		# a file with the name provided by the user is in the ./images/backgrounds directory
 		configDir = os.path.join(scriptDir,"./configs/")
 		if not os.path.isdir(configDir):
 			# there is no config directory, create one
 			os.mkdir("configs")
 		# store the name of the background image file (without the file extension)
-		bg_config, ext = os.path.splitext((sys.argv[1]))
+		f_name, ext = os.path.splitext((sys.argv[1]))
+		bg_config.append(f_name)
 	else:
 		# we were unable to locate an image matching the user's argument
 		# in the ./images/backgrounds folder
-		print("error: cannot find file " + bg_filename)
+		print("error: cannot find file " + str(bg_filename[0]))
 		# close the application
 		exit()
 
@@ -193,11 +204,11 @@ class Grid():
 			"bg_y_tiles"  : 6
 		}
 		
-		bg_filename = bg_args[bg_arg_idx["bg_filename"]]
-		bg_w =        bg_args[bg_arg_idx["bg_w"]]
-		bg_h =        bg_args[bg_arg_idx["bg_h"]]
-		bg_ofs_x =    bg_args[bg_arg_idx["bg_ofs_x"]]
-		bg_ofs_y =    bg_args[bg_arg_idx["bg_ofs_y"]]
+		bg_filename =   bg_args[bg_arg_idx["bg_filename"]]
+		bg_w =          bg_args[bg_arg_idx["bg_w"]]
+		bg_h =          bg_args[bg_arg_idx["bg_h"]]
+		bg_ofs_x =      bg_args[bg_arg_idx["bg_ofs_x"]]
+		bg_ofs_y =      bg_args[bg_arg_idx["bg_ofs_y"]]
 		bg_x_tiles =    bg_args[bg_arg_idx["bg_x_tiles"]]
 		bg_y_tiles =    bg_args[bg_arg_idx["bg_y_tiles"]]
 		
@@ -412,7 +423,20 @@ class Grid():
 			clock.tick(30)
 		self.draw()
 
-rfgrid = rfgridInit(bg_filename = bg_filename)
+	def configureNewBackground(self,bg_img):
+		self.bg_surf = pygame.image.load(bg_img)
+		self.bg_filename = bg_img
+		self.bg_w = self.bg_surf.get_width() 
+		self.bg_h = self.bg_surf.get_height()
+		self.bg_ofs_x = 0
+		self.bg_ofs_y = 0
+		self.bg_x_tiles = self.grid_x_tiles
+		self.bg_y_tiles = self.grid_x_tiles
+		rfgrid.updateMenu("rfgrid background scaler:\n Press \'Enter\' to start",30)
+		self.draw()
+		
+
+rfgrid = rfgridInit(bg_filename = "./images/backgrounds/" + str(bg_filename[0]))
 rfgrid.updateMenu("rfgrid background scaler:\n Press \'Enter\' to start",30)
 done = False
 
@@ -438,7 +462,8 @@ while not done:
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
 			rfgrid.scrollBackground(0,-1)
 		elif event.type == pygame.KEYDOWN and (event.key == pygame.K_s):
-			bg_config_file = open(configDir + bg_config + ".rfgridbg", "w+")
+			
+			bg_config_file = open(configDir + str(bg_config[bg_processed]) + ".rfgridbg", "w+")
 			# save background configuration file
 			bg_config_file.write("bg_filename=%s\n" % rfgrid.bg_filename)
 			bg_config_file.write("bg_w=%d\n" % rfgrid.bg_surf.get_width())
@@ -448,6 +473,11 @@ while not done:
 			bg_config_file.write("bg_x_tiles=%d\n"% rfgrid.bg_x_tiles)
 			bg_config_file.write("bg_y_tiles=%d\n"% rfgrid.bg_y_tiles)
 			bg_config_file.close()
-			done=True
+			bg_processed += 1
+			if bg_processed == len(bg_filename):
+				done=True
+			else:
+				print(str(bg_filename[bg_processed]))
+				rfgrid.configureNewBackground("./images/backgrounds/" + str(bg_filename[bg_processed]))
 	clock.tick(30)
 pygame.quit()

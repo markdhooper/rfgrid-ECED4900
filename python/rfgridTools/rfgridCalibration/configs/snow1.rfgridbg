@@ -1,7 +1,7 @@
 bg_filename=./images/backgrounds/snow1.jpg
-bg_w=1920
-bg_h=2404
-bg_ofs_x=0
+bg_w=1896
+bg_h=2400
+bg_ofs_x=-76
 bg_ofs_y=-1760
 bg_x_tiles=24
 bg_y_tiles=30

@@ -1,7 +1,7 @@
 bg_filename=./images/backgrounds/snow3.jpg
-bg_w=1600
-bg_h=1603
-bg_ofs_x=0
-bg_ofs_y=0
+bg_w=1580
+bg_h=1600
+bg_ofs_x=-392
+bg_ofs_y=-960
 bg_x_tiles=20
 bg_y_tiles=20

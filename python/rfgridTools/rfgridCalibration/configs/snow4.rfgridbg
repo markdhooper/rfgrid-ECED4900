@@ -1,7 +1,7 @@
 bg_filename=./images/backgrounds/snow4.jpg
-bg_w=1760
-bg_h=1202
-bg_ofs_x=-1120
-bg_ofs_y=-160
+bg_w=1738
+bg_h=1200
+bg_ofs_x=3
+bg_ofs_y=-560
 bg_x_tiles=22
 bg_y_tiles=15

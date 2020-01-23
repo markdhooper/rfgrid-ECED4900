@@ -21,7 +21,7 @@ x = 0
 y = 0
 
 CMD_UPDATE = b'\x00'
-serPort = serial.Serial(port = "COM3", baudrate = 9600, timeout = 1)
+serPort = serial.Serial(port = "COM5", baudrate = 9600, timeout = 1)
 serPort.flushOutput() 
 serPort.flushInput() 
 done = False
@@ -36,7 +36,7 @@ while not done:
             y = int.from_bytes(serPort.read(1),byteorder = 'big')
             if ID != 0:
                 print("TAG FOUND: ID: "+ str(hex(ID))+ " (" + str(hex(x)) + "," + str(hex(y)) + ")")
-                tagFile.write(str(ID) + ' ' + str(x) + ' ' + str(y) + '\n')
+                tagFile.write(str(ID) + '\t' + str(x) + '\t' + str(y) + '\n')
                 scannedx = x
                 scannedy = y
                 print("Tag ID stored as: " + str(ID) + ' ' + str(x) + ' ' + str(y))

@@ -17,6 +17,9 @@ deviceDim = {
 	"16x16": (16,16)
 }
 
+#TESting 123 :^)
+
+
 # get command line arguments
 if len(sys.argv) == 1:
 	print(

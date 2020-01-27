@@ -12,10 +12,10 @@ current_os = platform.system()
 
 
 def windows():
-    print( "\U000025B6"+"You are running on Windows!" + "\U0001F4BB")
+    print( "\U000025B6"+"OS: Windows " + "\U0001F4BB")
 
 def macos():
-    print( "\U000025B6 "+"You are running on MacOS.." + "\U0001F4BB" )
+    print( "\U000025B6 "+"OS: MacOS " + "\U0001F4BB" )
     print("\U000025B6 "+"Verying pip module exists.. " + "\U0001F504")
     cmd_output = (subprocess.call(["pip", "--version"]))
     if(cmd_output == succesfull):
@@ -35,7 +35,7 @@ def macos():
 
 
 def linux():
-    print("You are running on linux" + "\U0001F4BB")
+    print("OS: Linux " + "\U0001F4BB")
 
 available_os = {
     "Windows": windows,

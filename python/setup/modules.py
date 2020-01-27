@@ -3,6 +3,7 @@ import subprocess
 import os
 import platform
 
+succesfull = 0
 
 
 #Determine host OS
@@ -16,9 +17,8 @@ def windows():
 def macos():
     print( "\U000025B6 "+"You are running on MacOS.." + "\U0001F4BB" )
     print("\U000025B6 "+"Verying pip module exists.. " + "\U0001F504")
-    cmd_output = (subprocess.check_output(["pip", "--version"]))
-    result = (cmd_output.decode("utf-8")).find("command not found")
-    if(result == -1):
+    cmd_output = (subprocess.call(["pip", "--version"]))
+    if(cmd_output == succesfull):
         print("\U000025B6 "+"pip is already installed.. " + "\U00002705")
     else:
 

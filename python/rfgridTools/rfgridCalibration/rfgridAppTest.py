@@ -26,15 +26,6 @@ while not done:
 	# 		if ID != 0:
 	# 			image = pygame.transform.smoothscale(pygame.image.load(tags[str(ID)]),(rfgrid.grid_x_step,rfgrid.grid_y_step))
 	# 			rfgrid.drawGrid(x,y,image)
-	# 		else:
-	# 			blankRect = pygame.Surface((rfgrid.grid_x_step,rfgrid.grid_y_step))
-	# 			blankRect.blit(rfgrid.bg_surf, (rfgrid.bg_ofs_x + x*rfgrid.grid_x_step,rfgrid.bg_ofs_y+ y*rfgrid.grid_y_step))
-	# 			print(rfgrid.grid_x_step*x + rfgrid.bg_ofs_x)
-	# 			print(rfgrid.grid_y_step*y - rfgrid.bg_ofs_y)
-	# 			print(rfgrid.grid_x_step + rfgrid.grid_x_step*x + rfgrid.bg_ofs_x)
-	# 			print(rfgrid.grid_y_step + rfgrid.grid_y_step*y - rfgrid.bg_ofs_y)
-	# 			rfgrid.drawGrid(x,y,blankRect)
-
 
 	for event in pygame.event.get():
 		# IF USER CLOSES THE WINDOW

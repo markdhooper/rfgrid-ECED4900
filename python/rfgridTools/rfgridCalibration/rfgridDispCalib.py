@@ -149,7 +149,7 @@ class Grid():
 #######################################################################
 # Beginning of Calibration Loop
 #######################################################################
-rfgridInit(bg_filename,1024,768,False,X_DIM,Y_DIM,450,350,950,800)
+rfgridInit(bg_filename,1600,900,True,X_DIM,Y_DIM,450,350,950,800)
 done = False
 CALIBRATION_STEP = 0
 

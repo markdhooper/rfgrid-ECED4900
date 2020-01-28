@@ -138,7 +138,6 @@ def createTiles(x_dim,y_dim):
 def tagSearch(tagList,tagID):
 	index = 0
 	for i in tagList:
-		print(i[0])
 		if(int(i[0]) == tagID):
 			return index
 		index  = index + 1
@@ -273,7 +272,6 @@ class Grid():
 		for x in range(x0,x0 + self.grid_x_tiles):
 			for y in range(y0,y0 + self.grid_y_tiles):
 				if self.game_tiles[x,y] != -1:
-					print(self.tags[self.game_tiles[x,y]][1])
 					img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
 					img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
 					self.drawGame(x,y,img)

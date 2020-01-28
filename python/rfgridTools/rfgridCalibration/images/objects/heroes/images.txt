@@ -1,6 +1,0 @@
-dwarf_male_def 03.png
-elf_fem_arch 01.png
-extras_hum_male_sage 00.png
-halfling_male_war 00.png
-hum_fem_div 04.png
-hum_male_caster 23.png

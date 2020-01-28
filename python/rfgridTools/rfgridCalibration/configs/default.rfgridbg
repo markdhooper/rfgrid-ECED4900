@@ -1,7 +1,7 @@
 bg_filename=./images/backgrounds/default.jpg
-bg_w=1764
-bg_h=1624
-bg_ofs_x=-565
-bg_ofs_y=-55
-bg_x_tiles=28
-bg_y_tiles=28
+bg_w=2880
+bg_h=3500
+bg_ofs_x=-1006
+bg_ofs_y=-2936
+bg_x_tiles=40
+bg_y_tiles=50

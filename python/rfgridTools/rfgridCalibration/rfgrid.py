@@ -36,12 +36,6 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 		"bg_x_tiles",
 		"bg_y_tiles"
 	]
-	# layout of tag config file
-	tag_arg_idx = {
-		"tag_id",
-		"tag_picture",
-		"tag_sound",
-	}
 
 	# check for presence of config file
 	if not os.path.isfile(g_config_name):
@@ -117,20 +111,20 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 			)
 		exit()
 
-
+	# Load the tag settings
 	tag_config_file = open(tag_config_name,"r")
 	tag_params = tag_config_file.readlines()
-	tag_list = []
+	tag_args = []
 	for i in range(len(tag_params)):
 		temp = (tag_params[i].rstrip("\n"))
-		tag_list.append(temp.split(","))
+		tag_args.append(temp.split(","))
 
 
 		
 	# Configuration files loaded successfully. Create the grid based on these settings
 	global rfgrid
 	global screen
-	rfgrid = Grid(grid_args,bg_args)
+	rfgrid = Grid(grid_args,bg_args,tag_args)
 	rfgrid.draw()
 	return rfgrid
 
@@ -138,7 +132,7 @@ def createTiles(x_dim,y_dim):
 	tiles = {}
 	for x in range(0, x_dim):
 		for y in range(0,y_dim):
-			tiles[x,y] = 0
+			tiles[x,y] = -1
 	return tiles
 
 def tagSearch(tagList,tagID):
@@ -148,6 +142,7 @@ def tagSearch(tagList,tagID):
 		if(int(i[0]) == tagID):
 			return index
 		index  = index + 1
+	return -1
 
 def updateTileMatrix(tileStateMatrix,objIDX,objPos_x,objPos_y):
 	for x in range(0,x_dim):
@@ -158,7 +153,7 @@ def updateTileMatrix(tileStateMatrix,objIDX,objPos_x,objPos_y):
 
 
 class Grid():
-	def __init__(self, grid_args, bg_args):
+	def __init__(self, grid_args, bg_args, tag_args):
 		global screen
 		# grid parameters
 		g_arg_idx = {
@@ -203,6 +198,7 @@ class Grid():
 		bg_ofs_y =    bg_args[bg_arg_idx["bg_ofs_y"]]
 		bg_x_tiles =    bg_args[bg_arg_idx["bg_x_tiles"]]
 		bg_y_tiles =    bg_args[bg_arg_idx["bg_y_tiles"]]
+
 		# class variables
 		self.menu_x = g_x
 		self.menu_y = g_y - 2*g_y_step
@@ -222,6 +218,8 @@ class Grid():
 		self.bg_h = bg_h
 		self.bg_ofs_x = bg_ofs_x
 		self.bg_ofs_y = bg_ofs_y
+		self.bg_x_tiles = bg_x_tiles
+		self.bg_y_tiles = bg_y_tiles
 		
 		self.grid_w = g_w
 		self.grid_h = g_h
@@ -232,8 +230,7 @@ class Grid():
 		self.grid_x_tiles = g_x_tiles
 		self.grid_y_tiles = g_y_tiles
 		
-		# Create a tile matrix corresponding to the size of the background
-		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
+
 		#this will be the surface on which game objects will be drawn
 
 		# setup the pygame screen
@@ -255,10 +252,31 @@ class Grid():
 			fontsize = self.menu_text_size,
 			width = self.menu_text_width
 			)
+
+		# Store Tag Information
+		self.tags = []
+		self.tag_count = 0
+		for i in tag_args:
+			tag = [int(i[0]),str(i[1])]
+			self.tags.append(tag)
+			self.tag_count += 1
+
+		# Create a tile matrix corresponding to the size of the background initialized to zero
+		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
 	
 	def draw(self):
 		global screen
 		self.grid_surf.blit(self.bg_surf,(self.bg_ofs_x, self.bg_ofs_y))
+		self.game_surf.fill((0,0,0,0))
+		x0 = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
+		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
+		for x in range(x0,x0 + self.grid_x_tiles):
+			for y in range(y0,y0 + self.grid_y_tiles):
+				if self.game_tiles[x,y] != -1:
+					print(self.tags[self.game_tiles[x,y]][1])
+					img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
+					img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
+					self.drawGame(x,y,img)
 		self.grid_surf.blit(self.game_surf,((self.bg_ofs_x, self.bg_ofs_y)))
 		self.menu_surf.fill(self.menu_bg_color)
 		self.menu_surf.blit(self.menu_text_surf,self.menu_text_pos)
@@ -271,13 +289,11 @@ class Grid():
 	def drawGame(self, game_x, game_y, surf):
 		if (game_x <= self.bg_x_tiles) and (game_y <= self.bg_y_tiles):
 			self.game_surf.blit(surf, (game_x*self.grid_x_step,game_y*self.grid_y_step))
-			self.draw()
 
 	#Draws using x and y grid coordinates
 	def drawGrid(self, grid_x, grid_y, surf):
 		if (grid_x <= self.grid_x_tiles) and (grid_y <= self.grid_y_tiles):
 			self.game_surf.blit(surf, ((grid_x*self.grid_x_step)-self.bg_ofs_x,(grid_y*self.grid_y_step)-self.bg_ofs_y))
-			self.draw()
 	
 	def scrollBackground(self,dx,dy):
 		x_test = self.bg_ofs_x + dx*self.grid_x_step
@@ -303,6 +319,24 @@ class Grid():
 			width = self.menu_text_width
 			)
 		self.draw()
+
+	# uniquely assigns the index to the game_tiles matrix at the coordinates provided
+	def updateGameTiles(self, game_x, game_y, index):
+		for x in range(0,self.bg_x_tiles):
+			for y in range(0,self.bg_y_tiles):
+				if(self.game_tiles[x,y] == index):
+					self.game_tiles[x,y] = -1
+		self.game_tiles[game_x,game_y] = index
+
+	def updateGridTiles(self, grid_x, grid_y, index):
+		x0 = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
+		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
+		for x in range(0,self.bg_x_tiles):
+			for y in range(0,self.bg_y_tiles):
+				if(self.game_tiles[x,y] == index):
+					self.game_tiles[x,y] = -1
+		self.game_tiles[x0+grid_x,y0+grid_y] = index
+
 
 #class rfgridObject():
 #	def __init__(

@@ -321,13 +321,15 @@ class Grid():
 		self.draw()
 
 	# uniquely assigns the index to the game_tiles matrix at the coordinates provided
+	# Use this one to address global x and y
 	def updateGameTiles(self, game_x, game_y, index):
 		for x in range(0,self.bg_x_tiles):
 			for y in range(0,self.bg_y_tiles):
 				if(self.game_tiles[x,y] == index):
 					self.game_tiles[x,y] = -1
 		self.game_tiles[game_x,game_y] = index
-
+	
+	# use this one to address x and y using the values transmitted by the hardware
 	def updateGridTiles(self, grid_x, grid_y, index):
 		x0 = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
 		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
@@ -336,11 +338,3 @@ class Grid():
 				if(self.game_tiles[x,y] == index):
 					self.game_tiles[x,y] = -1
 		self.game_tiles[x0+grid_x,y0+grid_y] = index
-
-
-#class rfgridObject():
-#	def __init__(
-#		self, name = "empty", id = 0, 
-#		image = "./images/objects/blank.png", 
-#		en_sound = None, ex_sound = None, sub_sound = None,
-#		sz_x = 1, sz_y = 1, x_pos = 0, y_pos = 0, ):

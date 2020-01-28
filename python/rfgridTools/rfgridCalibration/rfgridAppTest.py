@@ -2,7 +2,7 @@ from rfgrid import *
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("Demo Jan 21, 2020",90,(0,0,0),(100,100,100))
+rfgrid.updateMenu("Added tag state management Jan 28, 2020",30,(0,0,0),(100,100,100))
 done = False
 
 import serial
@@ -55,26 +55,17 @@ while not done:
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
 			rfgrid.scrollBackground(0,-1)
 
-		# a will spawn a rect at a random place within view
+		# Pressing a will simulate a random tag event, at a random x,y coordinate
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
 			x = int(numpy.random.randint(0,8))
 			y = int(numpy.random.randint(0,8))
 			id = rfgrid.tags[numpy.random.randint(0,rfgrid.tag_count)][0]
+			# tag search will return a valid index if the ID sent is
+			# within the tags.rfgridtag file
 			index = tagSearch(rfgrid.tags,id)
 			if index != -1:
 				rfgrid.updateGridTiles(x,y,index)
 				rfgrid.draw()
-			
-
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_b:
-			x = 0
-			y = 3
-			w = rfgrid.grid_x_step
-			h = rfgrid.grid_y_step
-			randRect = pygame.Surface((w,h))
-			randRect.fill((255,255,255))
-			rfgrid.drawGrid(x,y,randRect)
-			rfgrid.updateMenu("Now I'm here!",60,(0,0,0),(100,100,100))
 	
 	clock.tick(30)
 pygame.quit()

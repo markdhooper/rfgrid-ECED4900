@@ -2,7 +2,7 @@ from rfgrid import *
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("Demo Jan 21, 2020",100,(0,0,0),(100,100,100))
+rfgrid.updateMenu("Demo Jan 21, 2020",90,(0,0,0),(100,100,100))
 done = False
 
 tags = {
@@ -121,6 +121,7 @@ while not done:
 			randRect = pygame.Surface((w,h))
 			randRect.fill((255,255,255))
 			rfgrid.drawGrid(x,y,randRect)
+			rfgrid.updateMenu("I'm here!",60,(0,0,0),(100,100,100))
 
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_b:
 			x = 0
@@ -130,6 +131,7 @@ while not done:
 			randRect = pygame.Surface((w,h))
 			randRect.fill((255,255,255))
 			rfgrid.drawGrid(x,y,randRect)
+			rfgrid.updateMenu("Now I'm here!",60,(0,0,0),(100,100,100))
 	
 	clock.tick(30)
 pygame.quit()

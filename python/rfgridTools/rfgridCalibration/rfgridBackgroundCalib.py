@@ -315,7 +315,7 @@ class Grid():
 					"4: " + str(OPT_W[3]) + " x " + str(OPT_H[3]) + "\n" +
 					"5: " + str(OPT_W[4]) + " x " + str(OPT_H[4])
 				)
-		self.updateMenu(msgStr, txt_sz = 25)
+		self.updateMenu(msgStr, txt_sz = 20)
 		self.draw()
 		selection = False
 		

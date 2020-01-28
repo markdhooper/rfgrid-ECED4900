@@ -1,7 +1,7 @@
 bg_filename=./images/backgrounds/mountain1.jpg
-bg_w=1460
-bg_h=2250
+bg_w=1260
+bg_h=1740
 bg_ofs_x=2
-bg_ofs_y=0
+bg_ofs_y=3
 bg_x_tiles=20
 bg_y_tiles=30

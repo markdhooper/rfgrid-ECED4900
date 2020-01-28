@@ -9,7 +9,7 @@ pygame.mixer.init()
 clock = pygame.time.Clock()
 screen = None
 
-def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './configs/default.rfgridbg'):
+def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './configs/default.rfgridbg',tag_config_name = "./configs/tags.rfgridtag"):
 	# layout of .rfgrid file
 	G_PARAM_MAX = 10
 	G_PARAM_FMT = [
@@ -36,7 +36,13 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 		"bg_x_tiles",
 		"bg_y_tiles"
 	]
-	
+	# layout of tag config file
+	tag_arg_idx = {
+		"tag_id",
+		"tag_picture",
+		"tag_sound",
+	}
+
 	# check for presence of config file
 	if not os.path.isfile(g_config_name):
 		print("error: grid configuration file(" + g_config_name + ") not found")
@@ -47,6 +53,10 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 		exit()
 	if not os.path.isfile(bg_config_name):
 		print("error: background configuration file(" + bg_config_name + ") not found") 
+		exit()
+
+	if not os.path.isfile(tag_config_name):
+		print("error: tag configuration file(" + tag_config_name + ") not found") 
 		exit()
 	g_config_file = open(g_config_name,"r")
 	g_params = g_config_file.readlines()
@@ -106,6 +116,16 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 			bg_config_name + ") invalid number of parameters"
 			)
 		exit()
+
+
+	tag_config_file = open(tag_config_name,"r")
+	tag_params = tag_config_file.readlines()
+	tag_list = []
+	for i in range(len(tag_params)):
+		temp = (tag_params[i].rstrip("\n"))
+		tag_list.append(temp.split(","))
+
+
 		
 	# Configuration files loaded successfully. Create the grid based on these settings
 	global rfgrid
@@ -115,11 +135,27 @@ def rfgridInit(g_config_name = './configs/grid.rfgrid', bg_config_name = './conf
 	return rfgrid
 
 def createTiles(x_dim,y_dim):
-    tiles = {}
-    for x in range(0, x_dim):
-        for y in range(0,y_dim):
-            tiles[x,y] = 0
-    return tiles
+	tiles = {}
+	for x in range(0, x_dim):
+		for y in range(0,y_dim):
+			tiles[x,y] = 0
+	return tiles
+
+def tagSearch(tagList,tagID):
+	index = 0
+	for i in tagList:
+		print(i[0])
+		if(int(i[0]) == tagID):
+			return index
+		index  = index + 1
+
+def updateTileMatrix(tileStateMatrix,objIDX,objPos_x,objPos_y):
+	for x in range(0,x_dim):
+		for y in range(0,y_dim):
+			if(tileStateMatrix[x,y]== objIDX):
+				tileStateMatrix[x,y] = 0
+	tileStateMatrix[objPos_x,objPos_y] = objIDX
+
 
 class Grid():
 	def __init__(self, grid_args, bg_args):
@@ -167,7 +203,6 @@ class Grid():
 		bg_ofs_y =    bg_args[bg_arg_idx["bg_ofs_y"]]
 		bg_x_tiles =    bg_args[bg_arg_idx["bg_x_tiles"]]
 		bg_y_tiles =    bg_args[bg_arg_idx["bg_y_tiles"]]
-		
 		# class variables
 		self.menu_x = g_x
 		self.menu_y = g_y - 2*g_y_step
@@ -243,7 +278,7 @@ class Grid():
 		if (grid_x <= self.grid_x_tiles) and (grid_y <= self.grid_y_tiles):
 			self.game_surf.blit(surf, ((grid_x*self.grid_x_step)-self.bg_ofs_x,(grid_y*self.grid_y_step)-self.bg_ofs_y))
 			self.draw()
-			
+	
 	def scrollBackground(self,dx,dy):
 		x_test = self.bg_ofs_x + dx*self.grid_x_step
 		y_test = self.bg_ofs_y + dy*self.grid_y_step
@@ -252,7 +287,7 @@ class Grid():
 		if (0 >= y_test) and (y_test >= -(self.bg_surf.get_height() - self.grid_y_tiles*self.grid_y_step)):
 			self.bg_ofs_y += dy*self.grid_y_step
 		self.draw()
-	
+
 	def updateMenu(self, menu_str, txt_sz = 15, col=(0,0,0), bg_col=(200,200,200)):
 		self.menu_str = str(menu_str)
 		self.menu_text_size = txt_sz

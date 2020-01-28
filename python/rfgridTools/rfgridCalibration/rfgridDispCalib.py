@@ -17,6 +17,8 @@ deviceDim = {
 	"16x16": (16,16)
 }
 
+
+
 # get command line arguments
 if len(sys.argv) == 1:
 	print(
@@ -47,7 +49,7 @@ pygame.init()
 clock = pygame.time.Clock()
 
 def rfgridInit(
-	bg_img, scr_w = 1024, scr_h = 728, 
+	bg_img, scr_w = 1024, scr_h = 768, 
 	fullScreen = False, x_tiles = 8, y_tiles = 8, 
 	x0 = 256, y0 = 191, x1 = 768, y1 = 573
 	):
@@ -147,7 +149,7 @@ class Grid():
 #######################################################################
 # Beginning of Calibration Loop
 #######################################################################
-rfgridInit(bg_filename,1600,900,True,X_DIM,Y_DIM,450,350,950,800)
+rfgridInit(bg_filename,1024,768,False,X_DIM,Y_DIM,450,350,950,800)
 done = False
 CALIBRATION_STEP = 0
 

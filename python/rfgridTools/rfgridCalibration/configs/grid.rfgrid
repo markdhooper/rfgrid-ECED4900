@@ -1,10 +1,10 @@
 scr_w=1600
 scr_h=900
-g_w=581
-g_h=567
-g_x=419
-g_y=148
-g_x_step=72
-g_y_step=70
+g_w=642
+g_h=646
+g_x=477
+g_y=182
+g_x_step=80
+g_y_step=80
 g_x_tiles=8
 g_y_tiles=8

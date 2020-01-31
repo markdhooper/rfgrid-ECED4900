@@ -2,30 +2,31 @@ from rfgrid import *
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("Added tag state management Jan 28, 2020",30,(0,0,0),(100,100,100))
+rfgrid.updateMenu("DEMO: 30 JAN 2020",60,(0,0,0),(100,100,100))
 done = False
 
 import serial
 
 # set up serial port and variables for communication
 CMD_UPDATE = b'\x00'
-#serPort = serial.Serial(port = "COM3", baudrate = 9600, timeout = 1)
-#serPort.flushOutput() 
-#serPort.flushInput() 
+serPort = serial.Serial(port = "COM5", baudrate = 9600, timeout = 1)
+serPort.flushOutput() 
+serPort.flushInput() 
 ID = 0
 x = 0
 y = 0
 
 
 while not done:
-	# if (serPort.inWaiting() > 0):
-	# 	if serPort.read(1) == CMD_UPDATE:
-	# 		ID = int.from_bytes(serPort.read(4), byteorder = 'big', signed = 0)
-	# 		x  = int.from_bytes(serPort.read(1), byteorder = 'big', signed = 0)
-	# 		y  = int.from_bytes(serPort.read(1), byteorder = 'big', signed = 0)
-	# 		if ID != 0:
-	# 			image = pygame.transform.smoothscale(pygame.image.load(tags[str(ID)]),(rfgrid.grid_x_step,rfgrid.grid_y_step))
-	# 			rfgrid.drawGrid(x,y,image)
+	if (serPort.inWaiting() > 0):
+		if serPort.read(1) == CMD_UPDATE:
+			ID = int.from_bytes(serPort.read(4), byteorder = 'big', signed = 0)
+			x  = int.from_bytes(serPort.read(1), byteorder = 'big', signed = 0)
+			y  = int.from_bytes(serPort.read(1), byteorder = 'big', signed = 0)
+			index = tagSearch(rfgrid.tags,ID)
+			if index != -1:
+				rfgrid.updateGridTiles(x,y,index)
+				rfgrid.draw()
 
 	for event in pygame.event.get():
 		# IF USER CLOSES THE WINDOW

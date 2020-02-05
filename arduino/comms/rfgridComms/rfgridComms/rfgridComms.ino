@@ -79,7 +79,7 @@ void RX_GET_ID()
   uint32_t id;
   
   byte argBytes[RX_GET_ID_BYTES];
-  Serial.readBytes(argBytes,RX_UPDATE_BYTES);
+  Serial.readBytes(argBytes,RX_GET_ID_BYTES);
 
   //do the things
   /*****************************************************************************/
@@ -233,7 +233,7 @@ void RX_SYNC()
   
   /**********************************************************************/
   /* HARDCODED ONLY FOR TESTING, these values will need to be computed  */
-          arg = 0;
+          arg = argBytes[0];
           num_readers = 64;
   /**********************************************************************/
 

@@ -72,7 +72,9 @@ TX_FMT = [
 
 # transmit formatted serial data to the rfgrid device
 def tx_rfgrid(serPort, buf = []):
-	print("TX <- RAW_BYTES: ")
+	print("TX <- RAW_BYTES: ", end = "")
+	print(buf)
+	serPort.write(buf)
 
 
 # transmit an update acknowledgement message to the rfgrid device
@@ -112,7 +114,9 @@ def tx_read_xy(serPort,x = 0,y = 0):
 
 # initiate/stop communication with rfgrid device 
 def tx_sync(serPort, begin = 1, x_max = 8, y_max = 8):
-	print("TX <- SYNC: ")
+	print("TX <- SYNC: begin=%d, x_max=%d, y_max=%d" % (begin,x_max,y_max))
+	buf = HOST_SYNC + serial.to_bytes([begin,x_max,y_max])
+	tx_rfgrid(serPort, buf)
 
 ###############################################################################
 #	RX FUNCTIONS
@@ -240,7 +244,7 @@ def TXMENU(serPort):
 		tx_get_id(serPort, x = 0, y = 0)
 	elif selection == '3':
 		#id
-		tx_get_xy(serPort, id):
+		tx_get_xy(serPort, id)
 	elif selection == '4':
 		#block
 		#id

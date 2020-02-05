@@ -1,0 +1,7 @@
+bg_filename=./images/backgrounds/chess.jpg
+bg_w=640
+bg_h=640
+bg_ofs_x=1
+bg_ofs_y=3
+bg_x_tiles=8
+bg_y_tiles=8

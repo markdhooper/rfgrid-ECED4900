@@ -1,30 +1,6 @@
 /*****************************************************************************/
 /* Data Structures */
 /*****************************************************************************/
-union readerLocation {
-    uint8_t addr8;
-    struct BR{
-        uint8_t readerID : 4;
-        uint8_t bankID : 4;
-    }addr4;
-    struct ydxdymxm{
-        uint8_t xmod : 2;
-        uint8_t ymod : 2;
-        uint8_t xdiv : 2;
-        uint8_t ydiv : 2;
-    }xy;
-  struct ab{
-    uint8_t ar0 : 1;
-    uint8_t ar1 : 1;
-    uint8_t ar2 : 1;
-    uint8_t ar3 : 1;
-    uint8_t ab0 : 1;
-    uint8_t ab1 : 1;
-    uint8_t ab2 : 1;
-    uint8_t ab3 : 1;
-  }addrBit;
-};
-
 union intUID {
   byte uidArr[4];
   uint32_t UID;
@@ -398,6 +374,8 @@ void (*RX_LUT[])() =
 /* Arduino Setup() and Loop() */
 /*****************************************************************************/
 
+
+
 void setup() {
   Serial.begin(9600);
   while(!Serial);
@@ -408,9 +386,6 @@ void setup() {
     cmd &= 0x07;
     if(cmd == 0x07)
     {
-      //INITIALIZE GRID HERE!!!!!!!!!!!!
-      //THEN TRANSMIT THE PROPER RESPONSE
-      //TO SYNC
         byte argBytes[RX_SYNC_BYTES];
         Serial.readBytes(argBytes,RX_SYNC_BYTES);
 

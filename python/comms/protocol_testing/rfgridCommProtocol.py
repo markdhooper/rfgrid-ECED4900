@@ -6,9 +6,9 @@ import msvcrt
 
 DEBUG = True
 rfgridComms = True
-COM_PORT = "COM6"
+COM_PORT = "COM7"
 
-# message values
+# Command Types
 DEV_UPDATE = b'\x00'
 DEV_GET_ID = b'\x01'
 DEV_GET_XY = b'\x02'
@@ -48,7 +48,7 @@ RX_FMT = [
 	(DEV_BLOCK, 	3, ARG_SIZE["arg"], 	ARG_SIZE["id"]),
 	(DEV_READ_ID, 	4, ARG_SIZE["id"], 		ARG_SIZE["off"], 	ARG_SIZE["size"], 	ARG_SIZE["data"]),
 	(DEV_WRITE_ID, 	5, ARG_SIZE["id"], 		ARG_SIZE["off"], 	ARG_SIZE["size"]),
-	(DEV_READ_XY, 	6, ARG_SIZE["x"], 		ARG_SIZE["y"], 		ARG_SIZE["id"], 	ARG_SIZE["off"], 	ARG_SIZE["data"]),
+	(DEV_READ_XY, 	6, ARG_SIZE["x"], 		ARG_SIZE["y"], 		ARG_SIZE["id"], 	ARG_SIZE["off"], 	ARG_SIZE["size"], ARG_SIZE["data"]),
 	(DEV_SYNC, 		7, ARG_SIZE["begin"], 	ARG_SIZE["num_readers"])
 ]
 
@@ -231,13 +231,15 @@ def TXMENU(serPort):
 	print("			6: TX_WRITE_ID"   )
 	print("			7: TX_READ_XY"    )
 	print("			8: TX_SYNC"       )
+	print("                          ")
 	selection = input("select an option:")
 	
 	if selection == '1':
-		#x
-		#y
-		#id
-		tx_update(serPort, x = 0, y = 0, id = 0)
+		print("TX_UPDATE(x,y,id): please provide the necessary arguments")
+		x = input("x = ")
+		y = input("y = ")
+		id = input("id = ")
+		tx_update(serPort, x, y, id)
 	elif selection == '2':
 		#x
 		#y

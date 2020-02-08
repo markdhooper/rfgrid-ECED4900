@@ -255,16 +255,16 @@ TX_LUT_KEYS = [
 
 def TXMENU(serPort):
 	print("COMMUNICATION PROTOCOL TESTING:")
-	print("  OPTIONS:")
-	print("  1: TX_UPDATE"     )
-	print("	 2: TX_GET_ID"     )
-	print("	 3: TX_GET_XY"     )
-	print("	 4: TX_BLOCK"      )
-	print("	 5: TX_READ_ID"    )
-	print("	 6: TX_WRITE_ID"   )
-	print("	 7: TX_READ_XY"    )
-	print("	 8: TX_SYNC"       )
-	print("	 q: QUIT"          )
+	print("OPTIONS:")
+	print("\t1: TX_UPDATE")
+	print("\t2: TX_GET_ID")
+	print("\t3: TX_GET_XY")
+	print("\t4: TX_BLOCK" )
+	print("\t5: TX_READ_ID")
+	print("\t6: TX_WRITE_ID")
+	print("\t7: TX_READ_XY")
+	print("\t8: TX_SYNC")
+	print("\tq: QUIT")
 	selection = input("select an option:")
 	
 	if selection == '1':

@@ -133,6 +133,8 @@ uint8_t boardSeqLen = 0;
 uint32_t blockedTags[BLOCKED_TAG_MAX];
 int BLOCKS_IN_EFFECT = 0;
 bool SYNC = 0;
+uint8_t x_max_global = 0;
+uint8_t y_max_global = 0;
 
 
 /*****************************************************************************/
@@ -223,44 +225,75 @@ void RX_BLOCK()
 	intUID id;
   
 	byte argBytes[RX_BLOCK_BYTES];
-	Serial.readBytes(argBytes,RX_UPDATE_BYTES);  
+	Serial.readBytes(argBytes,RX_BLOCK_BYTES);  
 
     id.uidArr[0] = argBytes[3];
     id.uidArr[1] = argBytes[2];
     id.uidArr[2] = argBytes[1];
     id.uidArr[3] = argBytes[0];
     arg = argBytes[4];
+
+  if(id.UID == 0){
+    arg = 0;
+    TX_BLOCK(id.UID,arg);
+    return;
+  }
   
   if(arg)
   {
-	//host wants us to block updates from this UID
-	for(int i = 0; i < BLOCKED_TAG_MAX; i++)
-	{
-		if(!blockedTags[i])
-		{
-			//we found a free slot, store the ID of the tag to block
-			blockedTags[i] = id.UID;
-			BLOCKS_IN_EFFECT++;
-      break;
-		}
-		else if(i == BLOCKED_TAG_MAX -1)
-		{
-			//We can't block this tag until they unblock another one
-			arg = 0;
-		}
-	}
+	  //host wants us to block updates from this UID
+	  for(int i = 0; i < BLOCKED_TAG_MAX; i++)
+	  {
+		  if(!blockedTags[i])
+		  {
+			  //we found a free slot, store the ID of the tag to block
+			  blockedTags[i] = id.UID;
+			  BLOCKS_IN_EFFECT++;
+        for(int j = 0; j< READER_LIMIT; j++)
+        {
+          if(Tiles[j].UID == id.UID)
+          {
+            Tiles[j].FLAGS.BLOCK = 1;
+            Tiles[j].FLAGS.ACK = 0;
+            break;  
+          }
+        }
+        break;
+		  }
+		  else if(i == BLOCKED_TAG_MAX -1)
+		  {
+			  //We can't block this tag until they unblock another one
+			  arg = 0;
+		  }
+	  }
   }
   else
   {
 	  //they want to unblock a tag
 	  for(int i = 0; i < BLOCKED_TAG_MAX; i++)
 	  {
-		if(blockedTags[i] == id.UID)
-		{
-			//we found a match
-			blockedTags[i] = 0;
-			BLOCKS_IN_EFFECT--;
-		}
+		  if(blockedTags[i] == id.UID)
+		  {
+			  //we found a match
+			  blockedTags[i] = 0;
+			  BLOCKS_IN_EFFECT--;
+        //Search for a reader with an id that matches our blocked tag
+        // and clear the flag
+        for(int j = 0; j< READER_LIMIT; j++)
+        {
+          if(Tiles[j].UID == id.UID)
+          {
+            //we found a match, unblock 
+            //the reader. And ensure that
+            //it tells the host where the
+            //newely unblocked tag is.
+            Tiles[j].FLAGS.BLOCK = 0;
+            Tiles[j].FLAGS.ACK = 1;
+            break;  
+          }
+        }
+        break;
+		  }
 	  }
   }
 
@@ -354,14 +387,22 @@ void RX_SYNC()
 	uint8_t y_max;
 	
 	byte argBytes[RX_SYNC_BYTES];
-	Serial.readBytes(argBytes,RX_UPDATE_BYTES);
+	Serial.readBytes(argBytes,RX_SYNC_BYTES);
 	
 
 	arg = argBytes[0];
-	
+  x_max = argBytes[1];
+  y_max = argBytes[2];
+  
 	if(!arg){
 		//host wants to stop communicating
 		SYNC = false;
+	}else if(x_max_global == x_max && y_max_global == y_max){
+    SYNC = true;
+	}else{
+	  arg = 0;
+    x_max = x_max_global;
+    y_max = y_max_global;
 	}
 	
 	//transmit the result
@@ -682,6 +723,8 @@ void setup(){
 					start = true;
 					SYNC = true;
 					boardSeqLen = 1;
+          x_max_global = 4;
+          y_max_global = 4;
 				}
 				else
 				{
@@ -708,6 +751,8 @@ void setup(){
 					boardSequence[1] = 1;
 					boardSequence[2] = 4;
 					boardSequence[3] = 5;
+          x_max_global = 8;
+          y_max_global = 8;
 				}
 				else
 				{
@@ -739,6 +784,8 @@ void setup(){
 					boardSequence[6] = 8;
 					boardSequence[7] = 9;
 					boardSequence[8] = 10;
+          x_max_global = 12;
+          y_max_global = 12;          
 				}
 				else
 				{
@@ -765,6 +812,8 @@ void setup(){
 					{
 						boardSequence[i] = i;
 					}
+          x_max_global = 16;
+          y_max_global = 16;
 				}
 				else
 				{
@@ -774,8 +823,8 @@ void setup(){
 					//inform them of our maximum
 					//and reset the board mask
 					arg = 0;
-					x_max = 12;
-					y_max = 12;
+					x_max = 16;
+					y_max = 16;
 					boardMask = 0xFFFF;
 				}
 				break;
@@ -852,8 +901,9 @@ void loop()
 				}
 				else
 				{
+          //No tag was detected 
 					Reader.PCD_AntennaOff();
-					if((Tiles[currentAddress.addr8].UID != 0)||Tiles[currentAddress.addr8].FLAGS.ACK)
+					if((Tiles[currentAddress.addr8].UID != 0))
 					{
 						//State change or host has yet to acknowledge previous state change
 						Tiles[currentAddress.addr8].UID = 0;

@@ -190,7 +190,7 @@ def rx_get_xy(args):
 def rx_block(args):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	arg = int.from_bytes(args[1], byteorder = 'big', signed = 0)
-	print("\nRX -> BLOCK: ")
+	print("\nRX -> BLOCK: id=%d, arg=%d" % (id,arg))
 	
 def rx_read_id(args):
 	print("\nRX -> READ_ID: ")

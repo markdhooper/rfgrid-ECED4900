@@ -2,6 +2,7 @@ import sys
 import subprocess
 import os
 import platform
+import time
 
 succesfull = 0
 
@@ -10,28 +11,30 @@ succesfull = 0
 
 current_os = platform.system()
 
-
 def windows():
-    print( "\U000025B6"+"OS: Windows " + "\U0001F4BB")
+	cmd_output = (subprocess.check_call(["pip", "--version"]))
+	if(cmd_output == succesfull):
+		print("> pip is already installed..")
+		if((subprocess.check_call([sys.executable, "-m", "pip", "install", "serial"]) != succesfull)):
+			print("> Could not install serial module..")	
+	
+		elif((subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"]) != succesfull)):
+			print("> Could not install numpy module..")
+		elif((subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame"]) != succesfull)):
+			print("> Could not install pygame module..")
+		print("> Installed all the required python modules..")
+	else:
+		print("> pip module is missing")
+
+        
+
+
+	
+	time.sleep(5)
 
 def macos():
-    print( "\U000025B6 "+"OS: MacOS " + "\U0001F4BB" )
-    print("\U000025B6 "+"Verying pip module exists.. " + "\U0001F504")
-    cmd_output = (subprocess.call(["pip", "--version"]))
-    if(cmd_output == succesfull):
-        print("\U000025B6 "+"pip is already installed.. " + "\U00002705")
-    else:
+	print("gonna merge later")
 
-        print("Installing pip..")
-
-    print("\U000025B6 "+ "Installing serial module.." + "\U000023F3")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "serial"])
-    print("\U000025B6 "+"Installing numpy module.." + "\U000023F3")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"])
-    print("\U000025B6 "+ "Installing pygame module.." + "\U000023F3")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame"])
-
-    print("\U000025B6 "+ "Installed all the required python modules.."+ "\U00002705")
 
 
 def linux():

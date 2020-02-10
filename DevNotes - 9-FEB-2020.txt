@@ -1,0 +1,37 @@
+[folders]
+<whatever the user named their game>
+
+Directory Structure Requirements:
+	[<gameName>]
+	->[configs]
+	....->grid.rfgrid          (created by running rfgridDispCalib.py)
+	....->default.rfgridbg	   (created by running rfgridBackgroundCalib.py *user has to pick a background image,and it needs to be renamed and copied first!)
+	....->tags.rfgridtag       (created using the C# application)
+	->[fonts]
+	....->__init__.py
+	....->UbuntuMono-Regular.ttf
+	->[images]
+	....->[backgrounds]
+	........->__init__.py
+	........-> (the background selected by the user is copied here and renamed default.jpg)
+	....->[objects]
+	........->__init__.py
+	........-> (whatever images selected by the user for tags are copied here)
+	->[sounds]
+	....-> (whatever sounds selected by the user are copied here)
+	->__init__.py
+	->ptext.py
+	-><gameName>.py (This will be a re-named copy of rfgridGame.py (which is a modified version of the current rfgridAppTest.py))
+	->rfgrid.py
+	->rfgridBackgroundCalib.py
+	->rfgridDispCalib.py
+	->rfgridCommunications.py (I need to make this)
+	->rfgridDispCalib.py
+	
+	
+shit I need to do:
+	make rfgridCommunications.py
+	make rfgridGame.py (which uses rfgridCommunications.py to talk to the arduino)
+	change how rfgridBackgroundCalib.py creates and stores background data (should be based on number of squares)
+	change how rfgrid.py loads background information (should resize based on number of squares in default.rfgridbg)
+	change the default ptext font to UbuntoMono-Regular.ttf

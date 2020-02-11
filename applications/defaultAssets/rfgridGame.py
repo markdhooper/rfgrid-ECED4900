@@ -4,7 +4,7 @@ from time import sleep
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("FEB 9, 2020",60,(0,0,0),(100,100,100))
+rfgrid.updateMenu("FEB 11, 2020",60,(0,0,0),(100,100,100))
 rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
 done = False
 
@@ -26,13 +26,13 @@ while not done:
 
 		# ARROW KEYPRESSES
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-			rfgrid.scrollBackground(-1,0)
+			rfgrid.scrollBackground(-1,0,smooth = False)
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-			rfgrid.scrollBackground(+1,0)
+			rfgrid.scrollBackground(+1,0,smooth = False)
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-			rfgrid.scrollBackground(0,+1)
+			rfgrid.scrollBackground(0,+1,smooth = False)
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-			rfgrid.scrollBackground(0,-1)
+			rfgrid.scrollBackground(0,-1, smooth = False)
 
 		# Pressing a will simulate a random tag event, at a random x,y coordinate
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
@@ -44,7 +44,22 @@ while not done:
 			index = tagSearch(rfgrid.tags,id)
 			if index != -1:
 				rfgrid.updateGridTiles(x,y,index)
-				rfgrid.draw()
+				if(rfgrid.tags[index][0]):
+					rfgrid.draw()
+				rfgrid.playTagSound(index)
+				if rfgrid.tags[index][1]:
+					if(x == 0):
+						# object detected on left Edge
+						rfgrid.scrollBackground(+2,0,smooth = True)
+					if(x == 7):
+						# object detected on right edge
+						rfgrid.scrollBackground(-2,0,smooth = True)
+					if(y == 0):
+						# object detected on top edge
+						rfgrid.scrollBackground(0,+2,smooth = True)
+					if(y == 7):
+						# object detected on bottom edge
+						rfgrid.scrollBackground(0,-2,smooth = True)
 	
-	clock.tick(30)
+	clock.tick(20)
 pygame.quit()

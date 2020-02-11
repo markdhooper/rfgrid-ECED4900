@@ -255,12 +255,38 @@ class Grid():
 		self.tags = []
 		self.tag_count = 0
 		for i in tag_args:
-			tag = [int(i[0]),str(i[1])]
-			self.tags.append(tag)
-			self.tag_count += 1
+			if len(i) == 1:
+				# only an ID
+				tag = [int(i[0]),str(""),str(""),str("")]
+				self.tag.append(tag)
+				self.tag.count += 1
+			elif len(i) == 2:
+				# ID and Image
+				tag = [int(i[0]),str(i[1]),str(""),str("")]
+				self.tags.append(tag)
+				self.tag_count += 1
+			elif len(i) == 3:
+				# ID, Image, and sound
+				tag = [int(i[0]),str(i[1]),str(i[2]),str("")]
+				self.tags.append(tag)
+				self.tag_count += 1
+			elif len(i) == 4:
+				tag = [int(i[0]),str(i[1]),str(i[2]),str(i[3])]
+				self.tags.append(tag)
+				self.tag_count += 1
 
 		# Create a tile matrix corresponding to the size of the background initialized to zero
 		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
+		
+
+		# Create Audio channels for each tag
+		self.audioChannels = []
+		self.entranceSoundPlayed = []
+		for i in range(0,self.tag_count):
+			self.audioChannels.append(pygame.mixer.Channel(int(i)))
+			self.entranceSoundPlayed.append(False)
+
+		
 	
 	def draw(self):
 		global screen
@@ -270,10 +296,13 @@ class Grid():
 		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
 		for x in range(x0,x0 + self.grid_x_tiles):
 			for y in range(y0,y0 + self.grid_y_tiles):
-				if self.game_tiles[x,y] != -1:
-					img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
-					img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
-					self.drawGame(x,y,img)
+				if (self.game_tiles[x,y] != -1):
+					# There is a tag on this square
+					if self.tags[self.game_tiles[x,y]][1]:
+						# there is an image to draw
+						img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
+						img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
+						self.drawGame(x,y,img)
 		self.grid_surf.blit(self.game_surf,((self.bg_ofs_x, self.bg_ofs_y)))
 		self.menu_surf.fill(self.menu_bg_color)
 		self.menu_surf.blit(self.menu_text_surf,self.menu_text_pos)
@@ -281,6 +310,21 @@ class Grid():
 		screen.blit(self.grid_surf,(self.grid_x, self.grid_y))
 		screen.blit(self.menu_surf,(self.menu_x, self.menu_y))
 		pygame.display.flip()
+
+	def playTagSound(self,tag_index):
+		if len(self.tags) > tag_index:
+			#valid index supplied
+			if self.tags[tag_index][2]:
+				#there is a sound file to play
+				if not self.entranceSoundPlayed[tag_index]:
+					# entrance sound has not been played
+					soundEffect = pygame.mixer.Sound(self.tags[tag_index][2])
+					self.audioChannels[tag_index].play(soundEffect)
+					self.entranceSoundPlayed[tag_index] = True
+				elif not self.audioChannels[tag_index].get_busy() and self.tags[tag_index][3]:
+					# play movement sound
+					soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
+					self.audioChannels[tag_index].play(soundEffect)
 
 	#Draws using absolute x and y coordinates
 	def drawGame(self, game_x, game_y, surf):
@@ -292,14 +336,73 @@ class Grid():
 		if (grid_x <= self.grid_x_tiles) and (grid_y <= self.grid_y_tiles):
 			self.game_surf.blit(surf, ((grid_x*self.grid_x_step)-self.bg_ofs_x,(grid_y*self.grid_y_step)-self.bg_ofs_y))
 	
-	def scrollBackground(self,dx,dy):
+	def scrollBackground(self,dx,dy,smooth = False,speed = 5):
 		x_test = self.bg_ofs_x + dx*self.grid_x_step
 		y_test = self.bg_ofs_y + dy*self.grid_y_step
 		if (0 >= x_test) and (x_test >= -(self.bg_surf.get_width() - self.grid_x_tiles*self.grid_x_step)):
-			self.bg_ofs_x += dx*self.grid_x_step
+			if smooth and int(dx):
+				bg_ofs_x_target = self.bg_ofs_x + dx*self.grid_x_step
+				nudge_x = int(dx/abs(dx))*speed
+				if(dx < 0):
+					# we're moving the background right (scrolling the viewport left)
+					while(self.bg_ofs_x > bg_ofs_x_target):
+						if((self.bg_ofs_x + nudge_x)<bg_ofs_x_target):
+							# only advance 1 pixel at a time to ensure
+							# that we don't lose grid alignment
+							self.bg_ofs_x += int(dx/abs(dx))
+							self.draw()
+						else:
+							# we can scroll faster than 1 pixel/frame
+							self.bg_ofs_x += nudge_x
+							self.draw()
+				else:
+					# we're moving the background left (scrolling the viewport right)
+					while(self.bg_ofs_x < bg_ofs_x_target):
+						if((self.bg_ofs_x + nudge_x)>bg_ofs_x_target):
+							# only advance 1 pixel at a time to ensure
+							# that we don't lose grid alignment
+							self.bg_ofs_x += int(dx/abs(dx))
+							self.draw()
+						else:
+							# we can scroll faster than 1 pixel/frame
+							self.bg_ofs_x += nudge_x
+							self.draw()
+			else:
+				self.bg_ofs_x += dx*self.grid_x_step
+				self.draw()
 		if (0 >= y_test) and (y_test >= -(self.bg_surf.get_height() - self.grid_y_tiles*self.grid_y_step)):
-			self.bg_ofs_y += dy*self.grid_y_step
-		self.draw()
+			if smooth and int(dy):
+				#we want to scroll the background smoothly
+				bg_ofs_y_target = self.bg_ofs_y + dy*self.grid_y_step
+				nudge_y = int(dy/abs(dy))*speed
+				if(dy < 0):
+					# we're moving the background down (scrolling the viewport up)
+					while(self.bg_ofs_y > bg_ofs_y_target):
+						if((self.bg_ofs_y + nudge_y)<bg_ofs_y_target):
+							# only advance 1 pixel at a time to ensure
+							# that we don't lose grid alignment
+							self.bg_ofs_y += int(dy/abs(dy))
+							self.draw()
+						else:
+							# we can scroll faster than 1 pixel/frame
+							self.bg_ofs_y += nudge_y
+							self.draw()
+				else:
+					# we're moving the background up (scrolling the viewport down)
+					while(self.bg_ofs_y < bg_ofs_y_target):
+						if((self.bg_ofs_y + nudge_y)>bg_ofs_y_target):
+							# only advance 1 pixel at a time to ensure
+							# that we don't lose grid alignment
+							self.bg_ofs_y += int(dy/abs(dy))
+							self.draw()
+						else:
+							# we can scroll faster than 1 pixel/frame
+							self.bg_ofs_y += nudge_y
+							self.draw()
+					
+			else:
+				self.bg_ofs_y += dy*self.grid_y_step
+				self.draw()
 
 	def updateMenu(self, menu_str, txt_sz = 15, col=(0,0,0), bg_col=(200,200,200)):
 		self.menu_str = str(menu_str)

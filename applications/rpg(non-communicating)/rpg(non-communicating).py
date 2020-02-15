@@ -1,5 +1,5 @@
 from rfgrid import *
-from rfgridCommunication import *
+#from rfgridCommunication import *
 from time import sleep
 import numpy
 

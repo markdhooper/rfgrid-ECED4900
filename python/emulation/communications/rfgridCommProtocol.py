@@ -4,21 +4,23 @@ import threading
 import sys
 import msvcrt
 
-DEBUG = True
 rfgridComms = True
 COM_PORT = "COM5"
 
 ###############################################################################
 # Setup 
 ###############################################################################
-serPort = serial.Serial(port = COM_PORT, baudrate = 9600, timeout = 1)
-serPort.flushOutput()
-serPort.flushInput()
-
 print("RFGRID COMMUNICATION PROTOCOL TESTER:")
 print("\t Press 'Enter' at any time to send a message.")
 print("\t( a SYNC message must be sent to begin communication with the device )")
-
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+	if "Arduino" in p[1]:
+		COM_PORT = p[0]
+		serPort = serial.Serial(port = COM_PORT, baudrate = 9600, timeout = 1)
+		serPort.flushOutput()
+		serPort.flushInput()
+		print("\tDevice detected on %s" % COM_PORT)
 
 ###############################################################################
 # Communication Protocols 

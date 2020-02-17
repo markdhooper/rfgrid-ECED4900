@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+#os.chdir(f'./applications/{sys.argv[1]}')
 import ptext
 scriptDir = os.path.dirname('__file__')
 

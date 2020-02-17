@@ -432,7 +432,7 @@ class Grid():
 		self.draw()
 		
 
-rfgrid = rfgridInit(bg_filename = "./images/backgrounds/" + str(bg_filename[0]))
+rfgrid = rfgridInit(bg_filename = str(bg_filename[0]))
 rfgrid.updateMenu("rfgrid background scaler:\n Press \'Enter\' to start",30)
 done = False
 

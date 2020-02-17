@@ -229,7 +229,7 @@
             this.TagCreatorGroupBox.Controls.Add(this.imageButton);
             this.TagCreatorGroupBox.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
             this.TagCreatorGroupBox.ForeColor = System.Drawing.Color.White;
-            this.TagCreatorGroupBox.Location = new System.Drawing.Point(25, 255);
+            this.TagCreatorGroupBox.Location = new System.Drawing.Point(19, 255);
             this.TagCreatorGroupBox.Name = "TagCreatorGroupBox";
             this.TagCreatorGroupBox.Size = new System.Drawing.Size(433, 222);
             this.TagCreatorGroupBox.TabIndex = 11;
@@ -458,6 +458,7 @@
             this.backgroundImgTextBox.Name = "backgroundImgTextBox";
             this.backgroundImgTextBox.Size = new System.Drawing.Size(181, 26);
             this.backgroundImgTextBox.TabIndex = 1;
+            this.backgroundImgTextBox.Text = "default.jpg";
             // 
             // label2
             // 

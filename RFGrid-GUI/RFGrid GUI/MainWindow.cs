@@ -25,7 +25,7 @@ namespace RFGrid_GUI
             //this.BackgroundImage = Properties.Resources.im; #disable until we find a better background image
             InitializeComponent();
 
-            //ApplicationsRefreshButton_Click(null,new EventArgs());
+            ApplicationsRefreshButton_Click(null,new EventArgs());
             
         }
 
@@ -211,7 +211,7 @@ namespace RFGrid_GUI
             if (!File.Exists(Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\pip.exe"))
             {
                 filePath = Directory.GetCurrentDirectory() + @"\python\setup\get-pip.py";
-                run_cmd(filePath, null,dispCalib);
+                run_cmd(filePath, "",dispCalib);
 
 
                 filePath = Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\Lib\site-packages" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6";
@@ -220,7 +220,7 @@ namespace RFGrid_GUI
             else
             {
                 filePath = Directory.GetCurrentDirectory() + @"\python\setup\modules.py";
-                run_cmd(filePath, null,dispCalib);
+                run_cmd(filePath, "",dispCalib);
             }
         }
 
@@ -286,15 +286,24 @@ namespace RFGrid_GUI
         {
             if (loadedConfigurationLabel.Text != "NA")
             {
-                Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
-                string backgrounds_path = Directory.GetCurrentDirectory() + "\\images\\backgrounds\\";
                 string filePath = "rfgridBackgroundCalib.py";
-                if (File.Exists(backgroundImgTextBox.Text))
+                Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
+                if (backgroundImgTextBox.Text == "default.jpg")
                 {
-                    System.IO.File.Copy(backgroundImgTextBox.Text, backgrounds_path + "default.jpg", true);
-                    run_cmd(filePath, null, backgroundCalib);
+                    ; //do nothing..
                 }
-
+                else
+                {
+                    
+                    string backgrounds_path = Directory.GetCurrentDirectory() + "\\images\\backgrounds\\";
+                    
+                    if (File.Exists(backgroundImgTextBox.Text))
+                    {
+                        System.IO.File.Copy(backgroundImgTextBox.Text, backgrounds_path + "default.jpg", true);
+                        
+                    }
+                }
+                run_cmd(filePath, "", backgroundCalib);
                 Directory.SetCurrentDirectory(original_dir);
 
             }

@@ -59,7 +59,7 @@ namespace RFGrid_GUI
                 }
                 if(PortList.Items.Count == EMPTY)
                 {
-                    string info = "No Arduino COM Port Found. Make sure Arduino Board is Connected to the Computer.";
+                    string info = "No Arduino COM Port Found.";
                     System.Windows.Forms.MessageBox.Show(info, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }

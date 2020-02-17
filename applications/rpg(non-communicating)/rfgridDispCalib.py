@@ -1,7 +1,7 @@
 import pygame
 import sys
 import os
-os.chdir(f'./applications/{sys.argv[1]}')
+#os.chdir(f'./applications/{sys.argv[1]}')
 import ptext
 scriptDir = os.path.dirname('__file__')
 
@@ -28,11 +28,11 @@ if len(sys.argv) < 2:
 		) 
 	exit()
 	
-elif(	(sys.argv[2] == "4x4")   or (sys.argv[2] == "8x8")   or
-		(sys.argv[2] == "12x12") or (sys.argv[2] == "16x16")
+elif(	(sys.argv[1] == "4x4")   or (sys.argv[1] == "8x8")   or
+		(sys.argv[1] == "12x12") or (sys.argv[1] == "16x16")
 	):
-	X_DIM, Y_DIM = deviceDim[sys.argv[2]]
-	bg_filename = "./images/backgrounds/" + sys.argv[2] + ".png"
+	X_DIM, Y_DIM = deviceDim[sys.argv[1]]
+	bg_filename = "./images/backgrounds/" + sys.argv[1] + ".png"
 	bg_filename = os.path.join(scriptDir, bg_filename)
 	if os.path.isfile(bg_filename):
 		configDir = os.path.join(scriptDir,"./configs/")
@@ -43,7 +43,7 @@ elif(	(sys.argv[2] == "4x4")   or (sys.argv[2] == "8x8")   or
 		print("error: cannot find file " + bg_filename)
 		exit()
 else:
-	print("error: invalid argument:" + sys.argv[2])
+	print("error: invalid argument:" + sys.argv[1])
 	exit()
 
 pygame.init()

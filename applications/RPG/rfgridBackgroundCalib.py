@@ -31,8 +31,6 @@ bg_config = []
 configDir = ""
 bg_processed = 0
 
-print("helloworld")
-
 # get command line arguments
 if len(sys.argv) == 1:
 	# User did not provide any arguments
@@ -416,8 +414,6 @@ class Grid():
 						self.bg_surf = pygame.transform.smoothscale(self.bg_surf,(new_bg_width,new_bg_height))
 						self.bg_ofs_x = -round((((new_bg_width/self.bg_x_tiles)*(self.grid_x_tiles))-self.grid_surf.get_width())/2)
 						self.bg_ofs_y = -round((((new_bg_height/self.bg_y_tiles)*(self.grid_y_tiles))-self.grid_surf.get_height())/2)
-						print(self.bg_ofs_x)
-						print(self.bg_ofs_y)
 						self.updateMenu("Scaling Complete:\n use the arrow keys to choose the starting position and press \'s\' to save or \'r\' to re-scale", txt_sz = 30)
 						scale_done = True
 			clock.tick(30)
@@ -436,7 +432,7 @@ class Grid():
 		self.draw()
 		
 
-rfgrid = rfgridInit(bg_filename = str("./images/backgrounds/" + bg_filename[0]))
+rfgrid = rfgridInit(bg_filename = str(bg_filename[0]))
 rfgrid.updateMenu("rfgrid background scaler:\n Press \'Enter\' to start",30)
 done = False
 

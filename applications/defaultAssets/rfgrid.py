@@ -282,6 +282,7 @@ class Grid():
 		# Create Audio channels for each tag
 		self.audioChannels = []
 		self.entranceSoundPlayed = []
+		pygame.mixer.set_num_channels(self.tag_count)
 		for i in range(0,self.tag_count):
 			self.audioChannels.append(pygame.mixer.Channel(int(i)))
 			self.entranceSoundPlayed.append(False)

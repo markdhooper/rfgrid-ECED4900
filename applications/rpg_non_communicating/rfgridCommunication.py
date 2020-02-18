@@ -172,7 +172,22 @@ def rx_update(args,rfgrid):
 	index = tagSearch(rfgrid.tags,id)
 	if index != -1:
 		rfgrid.updateGridTiles(x,y,index)
-		rfgrid.draw()
+		if(rfgrid.tags[index][0]):
+			rfgrid.draw()
+		rfgrid.playTagSound(index)
+		if rfgrid.tags[index][1]:
+			if(x == 0):
+				# object detected on left Edge
+				rfgrid.scrollBackground(+2,0,smooth = True)
+			if(x == 7):
+				# object detected on right edge
+				rfgrid.scrollBackground(-2,0,smooth = True)
+			if(y == 0):
+				# object detected on top edge
+				rfgrid.scrollBackground(0,+2,smooth = True)
+			if(y == 7):
+				# object detected on bottom edge
+				rfgrid.scrollBackground(0,-2,smooth = True)
 	
 def rx_get_id(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)

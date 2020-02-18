@@ -1,19 +1,20 @@
 from rfgrid import *
-#from rfgridCommunication import *
+from rfgridCommunication import *
 from time import sleep
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("rfgrid - chess",60,(0,0,0),(100,100,100))
-#rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
+rfgrid.updateMenu("Initializing Grid:\nPlease Wait...",40,(0,0,0),(255,255,255))
+rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
 done = False
 
 while not done:
-#	if (rfgridSerial.inWaiting() > 0):
-#		# there is data in the serial buffer
-#		# extract the command byte, and the arguments from the buffer
-#		cmdIdx, args = rx_rfgrid(rfgridSerial)
-#		RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+	if (rfgridSerial.inWaiting() > 0):
+		# there is data in the serial buffer
+		# extract the command byte, and the arguments from the buffer
+		cmdIdx, args = rx_rfgrid(rfgridSerial)
+		RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+		rfgrid.updateMenu("rfgrid - chess",60,(0,0,0),(255,255,255))
 
 	for event in pygame.event.get():
 		# IF USER CLOSES THE WINDOW

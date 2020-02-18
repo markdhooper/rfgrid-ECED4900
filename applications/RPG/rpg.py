@@ -4,7 +4,7 @@ from time import sleep
 import numpy
 
 rfgrid = rfgridInit()
-rfgrid.updateMenu("FEB 11, 2020",60,(0,0,0),(100,100,100))
+rfgrid.updateMenu("rfgrid - rpg",60,(0,0,0),(100,100,100))
 rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
 done = False
 

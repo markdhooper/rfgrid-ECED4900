@@ -72,11 +72,14 @@ namespace RFGrid_GUI
 
         private void SaveButtonPorts_Click(object sender, EventArgs e)
         {
+            if (PortList.GetItemText(PortList.SelectedItem) != "")
+            {
 
-            this.mainForm.LabelText = (PortList.GetItemText(PortList.SelectedItem));
-            mainForm.Text = mainForm.LabelText;
-            System.Windows.Forms.MessageBox.Show("Selected Port: " + mainForm.LabelText  , "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            this.Close();
+                this.mainForm.LabelText = (PortList.GetItemText(PortList.SelectedItem));
+                mainForm.Text = mainForm.LabelText;
+                System.Windows.Forms.MessageBox.Show("Selected Port: " + mainForm.LabelText, "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                this.Close();
+            }
 
         }
 

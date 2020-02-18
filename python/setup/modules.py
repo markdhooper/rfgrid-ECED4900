@@ -15,8 +15,8 @@ def windows():
 	cmd_output = (subprocess.check_call(["pip", "--version"]))
 	if(cmd_output == succesfull):
 		print("> pip is already installed..")
-		if((subprocess.check_call([sys.executable, "-m", "pip", "install", "serial"]) != succesfull)):
-			print("> Could not install serial module..")	
+		if((subprocess.check_call([sys.executable, "-m", "pip", "install", "pyserial"]) != succesfull)):
+			print("> Could not install pyserial module..")	
 	
 		elif((subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy"]) != succesfull)):
 			print("> Could not install numpy module..")

@@ -332,6 +332,8 @@
             this.dispCalibYBox.Name = "dispCalibYBox";
             this.dispCalibYBox.Size = new System.Drawing.Size(45, 26);
             this.dispCalibYBox.TabIndex = 4;
+            this.dispCalibYBox.Text = "8";
+            this.dispCalibYBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DispCalibYBox_TextChanged);
             // 
             // dispCalibrateButton
             // 
@@ -370,6 +372,8 @@
             this.dispCalibXBox.Name = "dispCalibXBox";
             this.dispCalibXBox.Size = new System.Drawing.Size(45, 26);
             this.dispCalibXBox.TabIndex = 1;
+            this.dispCalibXBox.Text = "8";
+            this.dispCalibXBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DispCalibXBox_TextChanged);
             // 
             // gridSizeLabel
             // 
@@ -703,6 +707,7 @@
             this.Controls.Add(this.TagCreatorGroupBox);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog; //No resizing
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

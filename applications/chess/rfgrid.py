@@ -203,7 +203,7 @@ class Grid():
 		self.menu_y = g_y - 2*g_y_step
 		self.menu_w = g_w
 		self.menu_h = 2*g_y_step
-		self.menu_bg_color = (200, 200, 200)
+		self.menu_bg_color = (255, 255, 255)
 		self.menu_text_color = (0, 0, 0)
 		self.menu_text_size = 20
 		self.menu_text_width = g_w - 2*g_x_step
@@ -255,25 +255,9 @@ class Grid():
 		self.tags = []
 		self.tag_count = 0
 		for i in tag_args:
-			if len(i) == 1:
-				# only an ID
-				tag = [int(i[0]),str(""),str(""),str("")]
-				self.tag.append(tag)
-				self.tag.count += 1
-			elif len(i) == 2:
-				# ID and Image
-				tag = [int(i[0]),str(i[1]),str(""),str("")]
-				self.tags.append(tag)
-				self.tag_count += 1
-			elif len(i) == 3:
-				# ID, Image, and sound
-				tag = [int(i[0]),str(i[1]),str(i[2]),str("")]
-				self.tags.append(tag)
-				self.tag_count += 1
-			elif len(i) == 4:
-				tag = [int(i[0]),str(i[1]),str(i[2]),str(i[3])]
-				self.tags.append(tag)
-				self.tag_count += 1
+			tag = [int(i[0]),str(i[1]),str(i[2]),str(i[3])]
+			self.tags.append(tag)
+			self.tag_count += 1
 
 		# Create a tile matrix corresponding to the size of the background initialized to zero
 		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
@@ -315,12 +299,13 @@ class Grid():
 	def playTagSound(self,tag_index):
 		if len(self.tags) > tag_index:
 			#valid index supplied
-			if self.tags[tag_index][2]:
+			if self.tags[tag_index][2] or self.tags[tag_index][3]:
 				#there is a sound file to play
 				if not self.entranceSoundPlayed[tag_index]:
 					# entrance sound has not been played
-					soundEffect = pygame.mixer.Sound(self.tags[tag_index][2])
-					self.audioChannels[tag_index].play(soundEffect)
+					if self.tags[tag_index][2]:
+						soundEffect = pygame.mixer.Sound(self.tags[tag_index][2])
+						self.audioChannels[tag_index].play(soundEffect)
 					self.entranceSoundPlayed[tag_index] = True
 				elif not self.audioChannels[tag_index].get_busy() and self.tags[tag_index][3]:
 					# play movement sound
@@ -405,7 +390,7 @@ class Grid():
 				self.bg_ofs_y += dy*self.grid_y_step
 				self.draw()
 
-	def updateMenu(self, menu_str, txt_sz = 15, col=(0,0,0), bg_col=(200,200,200)):
+	def updateMenu(self, menu_str, txt_sz = 15, col=(0,0,0), bg_col=(255,255,255)):
 		self.menu_str = str(menu_str)
 		self.menu_text_size = txt_sz
 		self.menu_text_color = col

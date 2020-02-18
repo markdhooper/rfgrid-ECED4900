@@ -93,7 +93,10 @@
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.PortList);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "AvailablePorts";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Select a COM Port";
@@ -108,5 +111,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Button saveButtonPorts;
+       
     }
 }

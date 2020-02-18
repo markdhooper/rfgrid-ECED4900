@@ -83,56 +83,56 @@ TX_FMT = [
 
 # transmit formatted serial data to the rfgrid device
 def tx_rfgrid(serPort, buf = []):
-	print("TX <- RAW_BYTES: ", end = "")
-	print(buf)
+	#print("TX <- RAW_BYTES: ", end = "")
+	#print(buf)
 	serPort.write(buf)
 
 # transmit an update acknowledgement message to the rfgrid device
 def tx_update(serPort, id = 0, x = 0, y = 0):
-	print("TX <- UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
+	#print("TX <- UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
 	buf = HOST_UPDATE + id.to_bytes(4,"big",signed = False) + serial.to_bytes([x,y])
 	tx_rfgrid(serPort,buf)
 
 # transmit a get_id request to the rfgrid device
 def tx_get_id(serPort, x = 0, y = 0):
-	print("TX <- GET_ID: x=%d, y=%d" % (x,y))
+	#print("TX <- GET_ID: x=%d, y=%d" % (x,y))
 	buf = HOST_GET_ID + serial.to_bytes([x,y])
 	tx_rfgrid(serPort,buf)
 
 
 # transmit a get_xy request to the rfgrid device
 def tx_get_xy(serPort, id):
-	print("TX <- GET_XY: id=%d" % id)
+	#print("TX <- GET_XY: id=%d" % id)
 	buf = HOST_GET_XY + id.to_bytes(4,"big",signed = False)
 	tx_rfgrid(serPort,buf)
 
 # transmit a block request to the rfgrid device
 def tx_block(serPort, id, block):
-	print("TX <- BLOCK: id=%d, block=%d" % (id,block))
+	#print("TX <- BLOCK: id=%d, block=%d" % (id,block))
 	buf = HOST_BLOCK + id.to_bytes(4,"big",signed = False) + serial.to_bytes([block])
 	tx_rfgrid(serPort,buf)
 
 # transmit a read_id request to the rfgrid device 
 def tx_read_id(serPort, id, ofs, size):
-	print("TX <- READ_ID: id=%d, offset=%d, size=%d" % (id,ofs,size))
+	#print("TX <- READ_ID: id=%d, offset=%d, size=%d" % (id,ofs,size))
 	buf = HOST_READ_ID + serial.to_bytes([id,ofs,size])
 	tx_rfgrid(serPort,buf)
 
 # transmit a write_id request to the rfgrid device
 def tx_write_id(serPort,id,ofs,size,data):
-	print("TX <- WRITE_ID: id=%d, offset=%d, size=%d, data=%x" % (id,ofs,size,data))
+	#print("TX <- WRITE_ID: id=%d, offset=%d, size=%d, data=%x" % (id,ofs,size,data))
 	buf = HOST_WRITE_ID + serial.to_bytes([id,ofs,size,data])
 	tx_rfgrid(serPort,buf)
 	
 # transmit a read_xy request to the rfgrid device
 def tx_read_xy(serPort, x, y, ofs, size):
-	print("TX <- READ_XY: id=%d, offset=%d, size=%d" % (x,y,ofs,size))
+	#print("TX <- READ_XY: id=%d, offset=%d, size=%d" % (x,y,ofs,size))
 	buf = HOST_READ_ID + serial.to_bytes([x,y,ofs,size])
 	tx_rfgrid(serPort,buf)
 	
 # initiate/stop communication with rfgrid device 
 def tx_sync(serPort, begin = 1, x_max = 8, y_max = 8):
-	print("TX <- SYNC: begin=%d, x_max=%d, y_max=%d" % (begin,x_max,y_max))
+	#print("TX <- SYNC: begin=%d, x_max=%d, y_max=%d" % (begin,x_max,y_max))
 	buf = HOST_SYNC + serial.to_bytes([begin,x_max,y_max])
 	tx_rfgrid(serPort, buf)
 
@@ -157,7 +157,7 @@ def rx_rfgrid(rx_buf):
 				else:
 					#read in the number of bytes defined by the 
 					#size argument (the current value of arg)
-					arg = rx_buf.read(arg)
+					arg = rx_buf.read(int(arg))
 				# add the argument to the args list
 				args.append(arg)
 			break
@@ -167,44 +167,62 @@ def rx_update(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	x  = int.from_bytes(args[1], byteorder = 'big', signed = 0)
 	y  = int.from_bytes(args[2], byteorder = 'big', signed = 0)
-	print("\nRX -> UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
+	#print("\nRX -> UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
 	tx_update(rfgridSerial, id, x, y)
 	index = tagSearch(rfgrid.tags,id)
 	if index != -1:
 		rfgrid.updateGridTiles(x,y,index)
-		rfgrid.draw()
+		if(rfgrid.tags[index][0]):
+			rfgrid.draw()
+		rfgrid.playTagSound(index)
+		if rfgrid.tags[index][1]:
+			if(x == 0):
+				# object detected on left Edge
+				rfgrid.scrollBackground(+2,0,smooth = True)
+			if(x == 7):
+				# object detected on right edge
+				rfgrid.scrollBackground(-2,0,smooth = True)
+			if(y == 0):
+				# object detected on top edge
+				rfgrid.scrollBackground(0,+2,smooth = True)
+			if(y == 7):
+				# object detected on bottom edge
+				rfgrid.scrollBackground(0,-2,smooth = True)
 	
 def rx_get_id(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	x  = int.from_bytes(args[1], byteorder = 'big', signed = 0)
 	y  = int.from_bytes(args[2], byteorder = 'big', signed = 0)
-	print("\nRX -> GET_ID: id=%d, x=%d, y=%d" % (id,x,y))
+	#print("\nRX -> GET_ID: id=%d, x=%d, y=%d" % (id,x,y))
 
 def rx_get_xy(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	x  = int.from_bytes(args[1], byteorder = 'big', signed = 0)
 	y  = int.from_bytes(args[2], byteorder = 'big', signed = 0)
-	print("\nRX -> GET_XY: id=%d, x=%d, y=%d" % (id,x,y))
+	#print("\nRX -> GET_XY: id=%d, x=%d, y=%d" % (id,x,y))
 
 def rx_block(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	arg = int.from_bytes(args[1], byteorder = 'big', signed = 0)
-	print("\nRX -> BLOCK: id=%d, arg=%d" % (id,arg))
+	#print("\nRX -> BLOCK: id=%d, arg=%d" % (id,arg))
 	
 def rx_read_id(args,rfgrid):
-	print("\nRX -> READ_ID: ")
+	#print("\nRX -> READ_ID: ")
+	pass
 	
 def rx_write_id(args,rfgrid):
-	print("\nRX -> WRITE_ID: ")
-	
+	#print("\nRX -> WRITE_ID: ")
+	pass
+
 def rx_read_xy(args,rfgrid):
-	print("\nRX -> READ_XY: ")
-	
+	#print("\nRX -> READ_XY: ")
+	pass
+
 def rx_sync(args,rfgrid):
 	begin = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	x_max = int.from_bytes(args[1], byteorder = 'big', signed = 0)
 	y_max = int.from_bytes(args[2], byteorder = 'big', signed = 0)
-	print("\nRX -> SYNC: begin=%d, x_max=%d, y_max=%d" % (begin,x_max,y_max))
+	#print("\nRX -> SYNC: begin=%d, x_max=%d, y_max=%d" % (begin,x_max,y_max))
 
 RX_LUT = {
 	"RX_UPDATE"		: rx_update,

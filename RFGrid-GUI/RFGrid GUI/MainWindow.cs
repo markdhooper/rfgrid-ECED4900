@@ -1,13 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Ports;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -25,11 +18,11 @@ namespace RFGrid_GUI
             //this.BackgroundImage = Properties.Resources.im; #disable until we find a better background image
             InitializeComponent();
 
-            ApplicationsRefreshButton_Click(null,new EventArgs());
-            
+            ApplicationsRefreshButton_Click(null, new EventArgs());
+
         }
 
-    
+
 
         private void ImageButton_Click(object sender, EventArgs e)
         {
@@ -39,8 +32,8 @@ namespace RFGrid_GUI
                 Filter = "Image files (*.png)|*.png",
                 Title = "Choose Image file"
             };
-            
-            if(openFileDialog1.ShowDialog() == DialogResult.OK)
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 imageTextBox.Text = openFileDialog1.FileName;
             }
@@ -88,14 +81,14 @@ namespace RFGrid_GUI
                 data = tagBox.Text + "," + new_image_path + "," + new_sound_path + "," + new_sound_second_path;
                 flag = true;
             }
-            else System.Windows.Forms.MessageBox.Show("Tag ID field cannot be empty!","Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            else System.Windows.Forms.MessageBox.Show("Tag ID field cannot be empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             if (flag)
             {
                 //Need to agree on where to copy. but this works right now.
                 string configs_path = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal + "\\configs\\";
                 string objects_path = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal + "\\images\\objects\\";
-                string sounds_path = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal+ "\\sounds\\";
+                string sounds_path = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal + "\\sounds\\";
                 string path = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal + "\\configs\\tags.rfgridtag";
                 if (Directory.Exists(configs_path))
                 {
@@ -116,9 +109,9 @@ namespace RFGrid_GUI
                                 arrLine[i] = data;
                                 duplicate_id = true;
                             }
-                            
+
                         }
-                        if(!duplicate_id)
+                        if (!duplicate_id)
                             System.IO.File.AppendAllText(path, data + Environment.NewLine);
                         else System.IO.File.WriteAllLines(path, arrLine);
 
@@ -133,7 +126,7 @@ namespace RFGrid_GUI
                         System.IO.File.Copy(soundTextBox.Text, sounds_path + Path.GetFileName(soundTextBox.Text), true);
                     if (secondSoundTextBox.Text != "")
                         System.IO.File.Copy(secondSoundTextBox.Text, sounds_path + Path.GetFileName(secondSoundTextBox.Text), true);
-                    if(imageTextBox.Text != "")
+                    if (imageTextBox.Text != "")
                         System.IO.File.Copy(imageTextBox.Text, objects_path + Path.GetFileName(imageTextBox.Text), true);
                     System.Windows.Forms.MessageBox.Show("Tag is sucessfully created.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -205,23 +198,42 @@ namespace RFGrid_GUI
         }
 
 
+        private bool isRunning = false;
         private void InstallModulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string filePath = "";
-            if (!File.Exists(Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\pip.exe"))
+
+            if (isRunning)
             {
-                filePath = Directory.GetCurrentDirectory() + @"\python\setup\get-pip.py";
-                run_cmd(filePath, "",dispCalib);
+                System.Windows.Forms.MessageBox.Show("Installing python modules..",
+                    "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            /* Using threading so multi-tasking is possible while installing modules.*/
+            System.Threading.Thread workerThread = new System.Threading.Thread(
+                new System.Threading.ThreadStart(() =>
+                {
+                    isRunning = true;
+                    debugTextBox.AppendText("Please wait while installing required python packages..");
+                    string filePath = "";
+                    if (!File.Exists(Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\pip.exe"))
+                    {
+                        filePath = Directory.GetCurrentDirectory() + @"\python\setup\get-pip.py";
+                        run_cmd(filePath, "", dispCalib);
 
 
-                filePath = Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\Lib\site-packages" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6";
-                System.Environment.SetEnvironmentVariable("PATH", filePath, EnvironmentVariableTarget.Machine);
-            }
-            else
-            {
-                filePath = Directory.GetCurrentDirectory() + @"\python\setup\modules.py";
-                run_cmd(filePath, "",dispCalib);
-            }
+                        /* This requires adminisrator priveleges */
+                        filePath = Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts\Lib\site-packages" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6\Scripts" + ";" + Directory.GetCurrentDirectory() + @"\python\python-3.7.6";
+                        System.Environment.SetEnvironmentVariable("PATH", filePath, EnvironmentVariableTarget.Machine);
+                    }
+                    else
+                    {
+                        filePath = Directory.GetCurrentDirectory() + @"\python\setup\modules.py";
+                        run_cmd(filePath, "", dispCalib);
+                    }
+                    isRunning = false;
+                }
+                ));
+            workerThread.Start();
         }
 
 
@@ -232,7 +244,8 @@ namespace RFGrid_GUI
 
             System.Diagnostics.ProcessStartInfo start = new System.Diagnostics.ProcessStartInfo();
             start.FileName = System.AppDomain.CurrentDomain.BaseDirectory + @"python\python-3.7.6\python.exe";
-            switch (type) {
+            switch (type)
+            {
                 case dispCalib:
                     args = args;
                     break;
@@ -294,13 +307,13 @@ namespace RFGrid_GUI
                 }
                 else
                 {
-                    
+
                     string backgrounds_path = Directory.GetCurrentDirectory() + "\\images\\backgrounds\\";
-                    
+
                     if (File.Exists(backgroundImgTextBox.Text))
                     {
                         System.IO.File.Copy(backgroundImgTextBox.Text, backgrounds_path + "default.jpg", true);
-                        
+
                     }
                 }
                 run_cmd(filePath, "", backgroundCalib);
@@ -313,6 +326,7 @@ namespace RFGrid_GUI
                     "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -327,6 +341,9 @@ namespace RFGrid_GUI
 
 
 
+
+
+
         const int RX_UPDATE = 0x00;
         const int RX_SYNC = 0x0F;
         private void TagGetIdButton_Click(object sender, EventArgs e)
@@ -334,13 +351,17 @@ namespace RFGrid_GUI
 
             if (portTextLabel.Text != "NA")
             {
-
+                if ((dispCalibXBox.Text == "") && (dispCalibYBox.Text == ""))
+                {
+                    dispCalibXBox.Text = "8";
+                    dispCalibYBox.Text = "8";
+                }
 
 
                 string[] arr = portTextLabel.Text.Split(' ');
                 int index = arr.Length;
                 /* Initialize set-up here*/
-                
+
                 serialPort.PortName = arr[index - 1];
                 serialPort.BaudRate = 9600;
                 serialPort.DataBits = 8;
@@ -348,11 +369,11 @@ namespace RFGrid_GUI
                 serialPort.StopBits = StopBits.One;
                 serialPort.RtsEnable = false;
                 serialPort.DtrEnable = false;
-                
+
                 serialPort.Open();
                 serialPort.DiscardInBuffer();
                 serialPort.DiscardOutBuffer();
-                TX_Sync(serialPort);
+                TX_Sync(serialPort, dispCalibXBox.Text, dispCalibYBox.Text);
 
 
                 serialPort.DataReceived += new
@@ -369,7 +390,7 @@ namespace RFGrid_GUI
 
         }
 
-       
+
         private void port_DataReceived(object sender,
                                  SerialDataReceivedEventArgs e)
         {
@@ -380,8 +401,8 @@ namespace RFGrid_GUI
             {
                 byte[] cmd = new byte[1];
                 byte[] args = new byte[6];
-                
-                sp.Read(cmd, 0,1); //READ ONE BYTE
+
+                sp.Read(cmd, 0, 1); //READ ONE BYTE
                 System.Threading.Thread.Sleep(50);
                 switch (cmd[0])
                 {
@@ -403,9 +424,10 @@ namespace RFGrid_GUI
                         idBytes[1] = args[2];
                         idBytes[0] = args[3];
                         UInt32 tagID = BitConverter.ToUInt32(idBytes, 0);
-                        if ((args[4] == 0x00) && (args[5] == 0x00) && (tagID != 0)) {
+                        if ((args[4] == 0x00) && (args[5] == 0x00) && (tagID != 0))
+                        {
                             tagBox.Text = tagID.ToString();
-                            }
+                        }
 
                         byte[] TX_UPDATE = new byte[7];
                         TX_UPDATE[0] = 0xF0;
@@ -421,27 +443,28 @@ namespace RFGrid_GUI
 
 
                 }
-        
+
             });
             System.Threading.Thread.Sleep(150);
 
         }
 
-  
 
-        private void TX_Sync(SerialPort serialPort){
+
+        private void TX_Sync(SerialPort serialPort, string device_x, string device_y)
+        {
             //send sync here..
-            byte x = Convert.ToByte(Int16.Parse(dispCalibXBox.Text));
-            byte y = Convert.ToByte(Int16.Parse(dispCalibYBox.Text));
-            var sync = new byte[] {0xFF, x, y}; //SYNC CMD= 0xFF , START BYTE= 0x01, XMAX = 0x08, YMAX = 0x08
-            serialPort.Write(sync,0,sync.Length);
+            byte x = Convert.ToByte(Int16.Parse(device_x));
+            byte y = Convert.ToByte(Int16.Parse(device_y));
+            var sync = new byte[] { 0xFF, 0x01, x, y }; //SYNC CMD= 0xFF , START BYTE= 0x01, XMAX = 0x08, YMAX = 0x08
+            serialPort.Write(sync, 0, sync.Length);
         }
 
 
         public void ApplicationsRefreshButton_Click(object sender, EventArgs e)
         {
             ApplicationsList.Items.Clear();
-            
+
             string applications_path = Directory.GetCurrentDirectory() + "\\applications";
             if (Directory.Exists(applications_path))
             {
@@ -459,6 +482,7 @@ namespace RFGrid_GUI
             {
                 System.Windows.Forms.MessageBox.Show("Cannot locate Applications Folder",
                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
             }
 
 
@@ -472,8 +496,8 @@ namespace RFGrid_GUI
         }
 
 
-        public void DirectoryCopy(string sourceFolder,string destination)
-            {
+        public void DirectoryCopy(string sourceFolder, string destination)
+        {
 
             DirectoryInfo dir = new DirectoryInfo(sourceFolder);
             DirectoryInfo[] dirs = dir.GetDirectories();
@@ -489,7 +513,7 @@ namespace RFGrid_GUI
             foreach (FileInfo file in files)
             {
                 string temppath = Path.Combine(destination, file.Name);
-                file.CopyTo(temppath,true);
+                file.CopyTo(temppath, true);
             }
 
             // If copying subdirectories, copy them and their contents to new location.
@@ -501,13 +525,13 @@ namespace RFGrid_GUI
 
         }
 
-        
+
         private void openExistingApplicationButton_Click(object sender, EventArgs e)
         {
 
             /* SELF NOTE *** NEED TO MAKE SURE ESSENTIAL FILES EXIST IN THE DIRECTORY *** */
             selectedGameGlobal = ApplicationsList.GetItemText(ApplicationsList.SelectedItem);
-            DialogResult result = System.Windows.Forms.MessageBox.Show("Application " + "\"" + selectedGameGlobal + "\"" +  " is sucessfully loaded.",
+            DialogResult result = System.Windows.Forms.MessageBox.Show("Application " + "\"" + selectedGameGlobal + "\"" + " is sucessfully loaded.",
       "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             loadedConfigurationLabel.Text = selectedGameGlobal;
         }
@@ -531,14 +555,14 @@ namespace RFGrid_GUI
         {
             string selected = ApplicationsList.GetItemText(ApplicationsList.SelectedItem);
             string selected_path = Directory.GetCurrentDirectory() + @"\applications\" + selected;
-            DialogResult result = System.Windows.Forms.MessageBox.Show("Are you sure to delete " +"\"" + selected + "\"" + " ?",
+            DialogResult result = System.Windows.Forms.MessageBox.Show("Are you sure to delete " + "\"" + selected + "\"" + " ?",
        "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes)
             {
                 DeleteFolder(selected_path);
-                result = System.Windows.Forms.MessageBox.Show("Application " + "\""+ selected + "\"" + "is sucessfully deleted.",
+                result = System.Windows.Forms.MessageBox.Show("Application " + "\"" + selected + "\"" + "is sucessfully deleted.",
                        "Information", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.OK) ApplicationsRefreshButton_Click(DeleteApplicationButton,e);
+                if (result == DialogResult.OK) ApplicationsRefreshButton_Click(DeleteApplicationButton, e);
             }
 
         }
@@ -547,7 +571,7 @@ namespace RFGrid_GUI
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(sourceFolder);
             DirectoryInfo[] dirs = directoryInfo.GetDirectories();
-     
+
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
                 file.Delete();
@@ -578,6 +602,25 @@ namespace RFGrid_GUI
             }
 
         }
-    }
 
+
+        /* Accepts Numbers Only */
+        private void DispCalibXBox_TextChanged(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+
+
+        private void DispCalibYBox_TextChanged(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+    }
 }

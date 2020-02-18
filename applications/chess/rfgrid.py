@@ -258,7 +258,7 @@ class Grid():
 			tag = [int(i[0]),str(i[1]),str(i[2]),str(i[3])]
 			self.tags.append(tag)
 			self.tag_count += 1
-
+		
 		# Create a tile matrix corresponding to the size of the background initialized to zero
 		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
 		
@@ -303,11 +303,11 @@ class Grid():
 				#there is a sound file to play
 				if not self.entranceSoundPlayed[tag_index]:
 					# entrance sound has not been played
-					if self.tags[tag_index][2]:
+					if self.tags[tag_index][2] != '':
 						soundEffect = pygame.mixer.Sound(self.tags[tag_index][2])
 						self.audioChannels[tag_index].play(soundEffect)
 					self.entranceSoundPlayed[tag_index] = True
-				elif not self.audioChannels[tag_index].get_busy() and self.tags[tag_index][3]:
+				elif not (self.audioChannels[tag_index].get_busy()) and (self.tags[tag_index][3] != ''):
 					# play movement sound
 					soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
 					self.audioChannels[tag_index].play(soundEffect)

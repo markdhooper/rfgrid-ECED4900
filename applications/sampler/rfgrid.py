@@ -273,10 +273,15 @@ class Grid():
 
 		
 	
-	def draw(self):
+	def draw(self, seq=False, seq_surface=None, seq_state=None):
 		global screen
 		self.grid_surf.blit(self.bg_surf,(self.bg_ofs_x, self.bg_ofs_y))
 		self.game_surf.fill((0,0,0,0))
+		if seq:
+			for y in range(0,8):
+				for x in range(0,8):
+					if seq_state[x][y]==True:
+						rfgrid.drawGame(y,x,seq_surface[x,y])
 		x0 = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
 		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
 		for x in range(x0,x0 + self.grid_x_tiles):

@@ -1,0 +1,11 @@
+100,./images/objects/clap.png,./sounds/clap1.wav,./sounds/clap1.wav
+101,./images/objects/cowbell.png,./sounds/cowbell1.wav,./sounds/cowbell1.wav
+102,./images/objects/hihat.png,./sounds/hihat1.wav,./sounds/hihat1.wav
+103,./images/objects/kick.png,./sounds/kick1.wav,./sounds/kick1.wav
+104,./images/objects/maracas.png,./sounds/maraca1.wav,./sounds/maraca1.wav
+105,./images/objects/snare.png,./sounds/snare1.wav,./sounds/snare1.wav
+106,./images/objects/tom.png,./sounds/tom1.wav,./sounds/tom1.wav
+107,./images/objects/hihat.png,./sounds/hihat2.wav,./sounds/hihat2.wav
+108,./images/objects/hihat.png,./sounds/hihat1.wav,./sounds/hihat1.wav
+109,./images/objects/kick.png,./sounds/kick1.wav,./sounds/kick1.wav
+110,./images/objects/maracas.png,./sounds/maraca1.wav,./sounds/maraca1.wav

@@ -266,26 +266,27 @@ class Grid():
 		# Create Audio channels for each tag
 		self.audioChannels = []
 		self.entranceSoundPlayed = []
-		pygame.mixer.set_num_channels(self.tag_count)
-		for i in range(0,self.tag_count):
+		pygame.mixer.set_num_channels(48)#FOR SEQUENCER
+		for i in range(0,48):
 			self.audioChannels.append(pygame.mixer.Channel(int(i)))
 			self.entranceSoundPlayed.append(False)
 
-		
+	
 	
 	def draw(self, seq=False, seq_surface=None, seq_state=None):
 		global screen
 		self.grid_surf.blit(self.bg_surf,(self.bg_ofs_x, self.bg_ofs_y))
 		self.game_surf.fill((0,0,0,0))
+		#ADDED FOR SEQUENCER
 		if seq:
 			for y in range(0,8):
 				for x in range(0,8):
 					if seq_state[x][y]==True:
-						rfgrid.drawGame(y,x,seq_surface[x,y])
+						rfgrid.drawGame(y,x,seq_surface[x][y])
 		x0 = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
 		y0 = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
 		for x in range(x0,x0 + self.grid_x_tiles):
-			for y in range(y0,y0 + self.grid_y_tiles):
+			for y in range(y0,y0 + self.grid_y_tiles-2):
 				if (self.game_tiles[x,y] != -1):
 					# There is a tag on this square
 					if self.tags[self.game_tiles[x,y]][1]:
@@ -301,21 +302,17 @@ class Grid():
 		screen.blit(self.menu_surf,(self.menu_x, self.menu_y))
 		pygame.display.flip()
 
-	def playTagSound(self,tag_index):
+	def playTagSound(self,tag_index,vol=1.0):
 		if len(self.tags) > tag_index:
 			#valid index supplied
-			if self.tags[tag_index][2] or self.tags[tag_index][3]:
+			if self.tags[tag_index][3]:
 				#there is a sound file to play
-				if not self.entranceSoundPlayed[tag_index]:
-					# entrance sound has not been played
-					if self.tags[tag_index][2] != '':
-						soundEffect = pygame.mixer.Sound(self.tags[tag_index][2])
-						self.audioChannels[tag_index].play(soundEffect)
-					self.entranceSoundPlayed[tag_index] = True
-				elif not (self.audioChannels[tag_index].get_busy()) and (self.tags[tag_index][3] != ''):
-					# play movement sound
-					soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
-					self.audioChannels[tag_index].play(soundEffect)
+				for i in range(0,48):
+					if not (self.audioChannels[i].get_busy()) and (self.tags[tag_index][3] != ''):
+						soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
+						soundEffect.set_volume(vol)
+						self.audioChannels[i].play(soundEffect)
+						break
 
 	#Draws using absolute x and y coordinates
 	def drawGame(self, game_x, game_y, surf):

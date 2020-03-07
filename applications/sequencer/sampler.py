@@ -9,12 +9,12 @@ rfgrid.updateMenu("Initializing Grid:\nPlease Wait...",40,(0,0,0),(255,255,255))
 done = False
 
 # sequencer parameters
-bpms = [60,80,100,120]
-bpm = bpms[0]
-play = False
-pause = True
-vol = 0
+bpm_idx = 0
 bpm_clk = 0
+bpm_alarm = [500,375,300,250]#for 60,80,100,120 bpm, how many miliseconds need to elapse.
+beat = 0
+vol_index = 3
+master_vol = float((vol_index+1)/8)
 
 # S - Sample Tile (beat 1)
 # s - Sample Tile (beat 2,3, or 4)
@@ -65,16 +65,24 @@ seq_state = [
 	[True,	False,	False,	False,	False,	False,	False,	False],
 	[True,	False,	False,	False,	False,	False,	False,	False],
 	[True,	True,	True,	True,	False,	False,	False,	False],
-	[True,	False,	False,	False,	False,	False,	False,	False]
+	[True,	False,	False,	False,	False,	True,	False,	False]
 ]
 
-seq_surface = {}
-for x in range(0,8):
-	for y in range(0,8):
-		if(seq_state[x][y]):
-			surf = pygame.image.load(seq_zone_dict[seq_zone_map[x][y]])
+seq_surface = [
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None],
+	[None,	None,	None,	None,	None,	None,	None,	None]
+]
+for col in range(0,8):
+	for row in range(0,8):
+			surf = pygame.image.load(seq_zone_dict[seq_zone_map[col][row]])
 			surf = pygame.transform.smoothscale(surf,(rfgrid.grid_x_step,rfgrid.grid_y_step))
-			seq_surface[x,y] = surf
+			seq_surface[col][row] = surf
 
 while not done:
 #	if (rfgridSerial.inWaiting() > 0):
@@ -84,13 +92,47 @@ while not done:
 #		RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
 #		rfgrid.updateMenu("rfgrid - sampler",60,(0,0,0),(255,255,255))
 
-	
+	bpm_clk += clock.get_time()
+	if(bpm_clk >= bpm_alarm[bpm_idx]):
+		rfgrid.draw(True,seq_surface,seq_state)
+		for col in range(0,6):
+			if seq_state[7][5] and (rfgrid.game_tiles[beat,col] != -1):
+				rfgrid.playTagSound(rfgrid.game_tiles[beat,col],master_vol)
+		if seq_state[7][5]:
+			#Play is enabled
+			for col in range(0,6):
+				seq_state[col][beat]=False
+				seq_state[col][(beat+1)%8]=True
+			beat = (beat + 1)%8
+		bpm_clk = 0
 		
 	for event in pygame.event.get():
-		#s keypress to test the drawing
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-			rfgrid.draw(True,seq_surface,seq_state)
-
+		#b keypress to change the bpm
+		if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+			seq_state[7][bpm_idx]=False
+			bpm_idx = (bpm_idx + 1)%4
+			seq_state[7][bpm_idx]=True
+		
+		#v keypress to change the volume
+		if event.type == pygame.KEYDOWN and event.key == pygame.K_v:
+			vol_index = (vol_index + 1)%8
+			master_vol = float((vol_index+1)/8)
+			for i in range(0,8):
+				if i <= vol_index:
+					seq_state[6][i]=True
+				else:
+					seq_state[6][i]=False
+					
+		#p will tolggle play or pause
+		if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+			if seq_state[7][5]:
+				#play is enabled
+				seq_state[7][5]=False
+				seq_state[7][6]=True
+			else:
+				seq_state[7][5]=True
+				seq_state[7][6]=False
+		
 		# IF USER CLOSES THE WINDOW
 		if event.type == pygame.QUIT:
 			done=True
@@ -98,21 +140,11 @@ while not done:
 		# ESCAPE KEYPRESS
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 			done=True
-
-		# ARROW KEYPRESSES
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-			rfgrid.scrollBackground(-1,0,smooth = False)
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-			rfgrid.scrollBackground(+1,0,smooth = False)
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-			rfgrid.scrollBackground(0,+1,smooth = False)
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-			rfgrid.scrollBackground(0,-1, smooth = False)
-
+			
 		# Pressing a will simulate a random tag event, at a random x,y coordinate
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
 			x = int(numpy.random.randint(0,8))
-			y = int(numpy.random.randint(0,8))
+			y = int(numpy.random.randint(0,6))
 			id = rfgrid.tags[numpy.random.randint(0,rfgrid.tag_count)][0]
 			# tag search will return a valid index if the ID sent is
 			# within the tags.rfgridtag file
@@ -120,21 +152,8 @@ while not done:
 			if index != -1:
 				rfgrid.updateGridTiles(x,y,index)
 				if(rfgrid.tags[index][0]):
-					rfgrid.draw()
-				rfgrid.playTagSound(index)
-				if rfgrid.tags[index][1]:
-					if(x == 0):
-						# object detected on left Edge
-						rfgrid.scrollBackground(+2,0,smooth = True)
-					if(x == 7):
-						# object detected on right edge
-						rfgrid.scrollBackground(-2,0,smooth = True)
-					if(y == 0):
-						# object detected on top edge
-						rfgrid.scrollBackground(0,+2,smooth = True)
-					if(y == 7):
-						# object detected on bottom edge
-						rfgrid.scrollBackground(0,-2,smooth = True)
+					rfgrid.draw(True,seq_surface,seq_state)
+				rfgrid.playTagSound(index,master_vol)
 	
-	clock.tick(20)
+	clock.tick(40)
 pygame.quit()

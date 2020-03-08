@@ -128,11 +128,11 @@ def rfgridInit(g_config_name = "./configs/grid.rfgrid", bg_config_name = "./conf
 	rfgrid.draw()
 	return rfgrid
 
-def createTiles(x_dim,y_dim):
+def createTiles(x_dim,y_dim,arg):
 	tiles = {}
 	for x in range(0, x_dim):
 		for y in range(0,y_dim):
-			tiles[x,y] = -1
+			tiles[x,y] = arg
 	return tiles
 
 def tagSearch(tagList,tagID):
@@ -260,13 +260,13 @@ class Grid():
 			self.tag_count += 1
 		
 		# Create a tile matrix corresponding to the size of the background initialized to zero
-		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
-		
+		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles,-1)
+		self.game_tile_sprite = createTiles(bg_x_tiles,bg_y_tiles,None)
 
 		# Create Audio channels for each tag
 		self.audioChannels = []
 		self.entranceSoundPlayed = []
-		pygame.mixer.set_num_channels(48)#FOR SEQUENCER
+		pygame.mixer.set_num_channels(96)#FOR SEQUENCER
 		for i in range(0,48):
 			self.audioChannels.append(pygame.mixer.Channel(int(i)))
 			self.entranceSoundPlayed.append(False)
@@ -291,9 +291,9 @@ class Grid():
 					# There is a tag on this square
 					if self.tags[self.game_tiles[x,y]][1]:
 						# there is an image to draw
-						img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
-						img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
-						self.drawGame(x,y,img)
+						#img = pygame.image.load(self.tags[self.game_tiles[x,y]][1])
+						#img = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
+						self.drawGame(x,y,self.game_tile_sprite[x,y])
 		self.grid_surf.blit(self.game_surf,((self.bg_ofs_x, self.bg_ofs_y)))
 		self.menu_surf.fill(self.menu_bg_color)
 		self.menu_surf.blit(self.menu_text_surf,self.menu_text_pos)
@@ -302,17 +302,19 @@ class Grid():
 		screen.blit(self.menu_surf,(self.menu_x, self.menu_y))
 		pygame.display.flip()
 
-	def playTagSound(self,tag_index,vol=1.0):
+	def playTagSound(self,tag_index,vol=1.0,ch=0):
 		if len(self.tags) > tag_index:
 			#valid index supplied
 			if self.tags[tag_index][3]:
 				#there is a sound file to play
-				for i in range(0,48):
-					if not (self.audioChannels[i].get_busy()) and (self.tags[tag_index][3] != ''):
-						soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
-						soundEffect.set_volume(vol)
-						self.audioChannels[i].play(soundEffect)
-						break
+				if (self.tags[tag_index][3] != ''):
+					if self.audioChannels[ch].get_busy():
+						self.audioChannels[ch].fadeout(200)
+						ch = (ch + 24)%48
+					soundEffect = pygame.mixer.Sound(self.tags[tag_index][3])
+					soundEffect.set_volume(vol)
+					self.audioChannels[ch].play(soundEffect)
+					
 
 	#Draws using absolute x and y coordinates
 	def drawGame(self, game_x, game_y, surf):
@@ -416,6 +418,8 @@ class Grid():
 				if(self.game_tiles[x,y] == index):
 					self.game_tiles[x,y] = -1
 		self.game_tiles[game_x,game_y] = index
+		img = pygame.image.load(self.tags[index])
+		self.game_tile_sprite[game_x,game_y] = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))
 	
 	# use this one to address x and y using the values transmitted by the hardware
 	def updateGridTiles(self, grid_x, grid_y, index):
@@ -426,3 +430,6 @@ class Grid():
 				if(self.game_tiles[x,y] == index):
 					self.game_tiles[x,y] = -1
 		self.game_tiles[x0+grid_x,y0+grid_y] = index
+		if self.tags[index][1] != -1:
+			img = pygame.image.load(self.tags[index][1])
+			self.game_tile_sprite[x0+grid_x,y0+grid_y] = pygame.transform.smoothscale(img,(self.grid_x_step,self.grid_y_step))

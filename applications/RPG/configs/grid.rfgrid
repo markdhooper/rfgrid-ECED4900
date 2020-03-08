@@ -1,9 +1,9 @@
 scr_w=1024
 scr_h=768
-g_w=494
-g_h=499
-g_x=259
-g_y=174
+g_w=495
+g_h=500
+g_x=267
+g_y=180
 g_x_step=61
 g_y_step=62
 g_x_tiles=8

@@ -894,7 +894,7 @@ void loop()
 						}
 						else
 						{
-							Tiles[currentAddress.addr8].FLAGS.ACK = 1; //set the acknowledge required flag
+							Tiles[currentAddress.addr8].FLAGS.ACK = 0; //set the acknowledge required flag
 							sendUpdate(currentAddress.addr8,Tiles[currentAddress.addr8].UID);
 						}
 					}
@@ -911,7 +911,7 @@ void loop()
 						if(!Tiles[currentAddress.addr8].FLAGS.BLOCK)
 						{
 							//updates for the tag previously on this reader are not blocked by host
-							Tiles[currentAddress.addr8].FLAGS.ACK = 1; //set the acknowledge required flag
+							Tiles[currentAddress.addr8].FLAGS.ACK = 0; //set the acknowledge required flag
 							sendUpdate(currentAddress.addr8,Tiles[currentAddress.addr8].UID);
 						}
 						else

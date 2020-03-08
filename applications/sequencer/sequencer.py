@@ -1,20 +1,26 @@
 from rfgrid import *
-#from rfgridCommunication import *
+from rfgridCommunication import *
 from time import sleep
 import numpy
 
 rfgrid = rfgridInit()
 rfgrid.updateMenu("Initializing Grid:\nPlease Wait...",40,(0,0,0),(255,255,255))
-#rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
+rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
 done = False
 
 # sequencer parameters
-bpm_idx = 0
+bpm_idx = 2
 bpm_clk = 0
-bpm_alarm = [500,375,300,250]#for 60,80,100,120 bpm, how many miliseconds need to elapse.
+bpm_alarm = [500,187,150,125]#for 60,80,100,120 bpm, how many miliseconds need to elapse.
 beat = 0
 vol_index = 3
 master_vol = float((vol_index+1)/8)
+channel = 0
+
+id = 0
+x = 0
+y = 0
+update_flag = False
 
 # S - Sample Tile (beat 1)
 # s - Sample Tile (beat 2,3, or 4)
@@ -65,7 +71,7 @@ seq_state = [
 	[True,	False,	False,	False,	False,	False,	False,	False],
 	[True,	False,	False,	False,	False,	False,	False,	False],
 	[True,	True,	True,	True,	False,	False,	False,	False],
-	[True,	False,	False,	False,	False,	True,	False,	False]
+	[False,	False,	True,	False,	False,	False,	True,	False]
 ]
 
 seq_surface = [
@@ -85,19 +91,95 @@ for col in range(0,8):
 			seq_surface[col][row] = surf
 
 while not done:
-#	if (rfgridSerial.inWaiting() > 0):
-#		# there is data in the serial buffer
-#		# extract the command byte, and the arguments from the buffer
-#		cmdIdx, args = rx_rfgrid(rfgridSerial)
-#		RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
-#		rfgrid.updateMenu("rfgrid - sampler",60,(0,0,0),(255,255,255))
-
+	if (rfgridSerial.inWaiting() > 0):
+		# there is data in the serial buffer
+		# extract the command byte, and the arguments from the buffer
+		cmdIdx, args = rx_rfgrid(rfgridSerial)
+		if(cmdIdx == 0):
+			# Update Message, special case for the sequencer
+			id,x,y = RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+			update_flag = True
+		else:
+			RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+		rfgrid.updateMenu("rfgrid - sequencer",60,(0,0,0),(255,255,255))
+	
+	if update_flag:
+		#we need to check to see at which x and y the update occurred
+		# INSTRUMENT
+		if(y < 6 and x < 8):
+			#update occurred within the play area
+			if(id == 0):
+				#tag was removed, make sure that 
+				#the image isn't drawn there anymore
+				rfgrid.game_tiles[x,y] = -1
+				channel -= 1
+			else:
+				#tag detected at (x,y)
+				index = tagSearch(rfgrid.tags,id)
+				if index != -1:
+					rfgrid.updateGridTiles(x,y,index)
+					channel += 1
+					if seq_state[7][6]:
+						#play the tag sound only if we are paused.
+						rfgrid.playTagSound(index,master_vol,channel)
+		
+		# VOLUME
+		elif (y == 6 and id != 0):
+			#tag detected on volume slider
+			vol_index = x
+			master_vol = float((vol_index+1)/8)
+			for i in range(0,8):
+				# illuminate all volume icons <= the x coordinate
+				if i <= x:
+					seq_state[6][i]=True
+				else:
+					seq_state[6][i]=False
+					
+		# BPM
+		elif (y == 7 and x < 4 and id != 0):
+			#tag detected at the BPM section
+			bpm_idx = x
+			for i in range(0,4):
+				#illuminate the corresponding BPM control
+				if i == x:
+					seq_state[7][i]=True
+				else:
+					seq_state[7][i]=False
+		# LOAD
+		elif (y == 7 and x == 4):
+			if(id != 0):
+				seq_state[7][4]=True
+			else:
+				seq_state[7][4]=False
+		
+		# PLAY
+		elif (y == 7 and x == 5 and id != 0):
+				seq_state[7][5]=True
+				seq_state[7][6]=False
+		
+		# PAUSE
+		elif (y == 7 and x == 6 and id != 0):
+				seq_state[7][5]=False
+				seq_state[7][6]=True
+				
+		# RECORD
+		elif (y == 7 and x == 7):
+			#tag detected at the BPM section
+			if(id != 0):
+				seq_state[7][7]=True
+			else:
+				seq_state[7][7]=False
+		
+		# draw the sequencer area and clear the update flag
+		rfgrid.draw(True,seq_surface,seq_state)
+		update_flag = False
+	
 	bpm_clk += clock.get_time()
 	if(bpm_clk >= bpm_alarm[bpm_idx]):
 		rfgrid.draw(True,seq_surface,seq_state)
-		for col in range(0,6):
-			if seq_state[7][5] and (rfgrid.game_tiles[beat,col] != -1):
-				rfgrid.playTagSound(rfgrid.game_tiles[beat,col],master_vol)
+		for row in range(0,6):
+			if seq_state[7][5] and (rfgrid.game_tiles[beat,row] != -1):
+				rfgrid.playTagSound(rfgrid.game_tiles[beat,row],master_vol,row+6*beat)
 		if seq_state[7][5]:
 			#Play is enabled
 			for col in range(0,6):
@@ -153,7 +235,7 @@ while not done:
 				rfgrid.updateGridTiles(x,y,index)
 				if(rfgrid.tags[index][0]):
 					rfgrid.draw(True,seq_surface,seq_state)
-				rfgrid.playTagSound(index,master_vol)
+				rfgrid.playTagSound(index,master_vol,10)
 	
-	clock.tick(40)
+	clock.tick(30)
 pygame.quit()

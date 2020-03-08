@@ -167,27 +167,8 @@ def rx_update(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)
 	x  = int.from_bytes(args[1], byteorder = 'big', signed = 0)
 	y  = int.from_bytes(args[2], byteorder = 'big', signed = 0)
-	#print("\nRX -> UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
-	tx_update(rfgridSerial, id, x, y)
-	index = tagSearch(rfgrid.tags,id)
-	if index != -1:
-		rfgrid.updateGridTiles(x,y,index)
-		if(rfgrid.tags[index][0]):
-			rfgrid.draw()
-		rfgrid.playTagSound(index)
-		if rfgrid.tags[index][1]:
-			if(x == 0):
-				# object detected on left Edge
-				rfgrid.scrollBackground(+2,0,smooth = True)
-			if(x == 7):
-				# object detected on right edge
-				rfgrid.scrollBackground(-2,0,smooth = True)
-			if(y == 0):
-				# object detected on top edge
-				rfgrid.scrollBackground(0,+2,smooth = True)
-			if(y == 7):
-				# object detected on bottom edge
-				rfgrid.scrollBackground(0,-2,smooth = True)
+	##tx_update(rfgridSerial, id, x, y)
+	return id,x,y
 	
 def rx_get_id(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)

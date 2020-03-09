@@ -169,25 +169,36 @@ def rx_update(args,rfgrid):
 	y  = int.from_bytes(args[2], byteorder = 'big', signed = 0)
 	#print("\nRX -> UPDATE: id=%d, x=%d, y=%d" % (id,x,y))
 	tx_update(rfgridSerial, id, x, y)
-	index = tagSearch(rfgrid.tags,id)
-	if index != -1:
-		rfgrid.updateGridTiles(x,y,index)
-		if(rfgrid.tags[index][0]):
-			rfgrid.draw()
-		rfgrid.playTagSound(index)
-		if rfgrid.tags[index][1]:
-			if(x == 0):
-				# object detected on left Edge
-				rfgrid.scrollBackground(+2,0,smooth = True)
-			if(x == 7):
-				# object detected on right edge
-				rfgrid.scrollBackground(-2,0,smooth = True)
-			if(y == 0):
-				# object detected on top edge
-				rfgrid.scrollBackground(0,+2,smooth = True)
-			if(y == 7):
-				# object detected on bottom edge
-				rfgrid.scrollBackground(0,-2,smooth = True)
+	if id != 0:
+		index = tagSearch(rfgrid.tags,id)
+		if index != -1:
+			rfgrid.updateGridTiles(x,y,index)
+			if(rfgrid.tags[index][0]):
+				rfgrid.draw()
+			rfgrid.playTagSound(index)
+			if rfgrid.tags[index][1]:
+				if(x == 0):
+					# object detected on left Edge
+					for i in range(0,3):
+						rfgrid.scrollBackground(+1,0,smooth = True)
+				if(x == 7):
+					# object detected on right edge
+					for i in range(0,3):
+						rfgrid.scrollBackground(-1,0,smooth = True)
+				if(y == 0):
+					# object detected on top edge
+					for i in range(0,3):
+						rfgrid.scrollBackground(0,+1,smooth = True)
+				if(y == 7):
+					# object detected on bottom edge
+					for i in range(0,3):
+						rfgrid.scrollBackground(0,-1,smooth = True)
+	elif not rfgrid.ignore_zero_ids:
+		x0 = int(round(abs(rfgrid.bg_ofs_x)/rfgrid.grid_x_step))
+		y0 = int(round(abs(rfgrid.bg_ofs_y)/rfgrid.grid_y_step))
+		rfgrid.game_tiles[x0+x,y0+y] = -1
+		rfgrid.draw()
+	return id, x, y
 	
 def rx_get_id(args,rfgrid):
 	id = int.from_bytes(args[0], byteorder = 'big', signed = 0)

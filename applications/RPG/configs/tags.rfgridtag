@@ -1,5 +1,11 @@
-1952181250,./images/objects/archer.png,./sounds/bow1.wav,./sounds/HeavyDirtRun4.wav
-1993009922,./images/objects/mage.png,./sounds/energyshield.wav,./sounds/HeavyDirtRun4.wav
-935914242,./images/objects/paladin.png,./sounds/largemetalweapon.wav,./sounds/HeavyDirtRun4.wav
-1322117890,./images/objects/barbarian.png,./sounds/warcry3.wav,./sounds/HeavyDirtRun4.wav
-1774926320,,./sounds/outdoors.wav,
+935914242,./images/objects/archer.png,./sounds/bow1.wav,./sounds/foot_stone.wav
+1952181250,./images/objects/wizard.png,./sounds/energyshield.wav,./sounds/foot_stone.wav
+1322117890,./images/objects/barbarian.png,./sounds/warcry3.wav,./sounds/foot_stone.wav
+1993009922,./images/objects/dwarf.png,./sounds/largemetalweapon.wav,./sounds/foot_stone.wav
+429471472,./images/objects/mindFlayer.png,./sounds/mf_enter.wav,./sounds/mf_update.wav
+4179704304,./images/objects/goblin1.png,./sounds/goblin.wav,./sounds/goblin.wav
+963459824,./images/objects/goblin2.png,./sounds/goblin.wav,./sounds/goblin.wav
+1506097648,./images/objects/goblin3.png,./sounds/goblin.wav,./sounds/goblin.wav
+432812272,./images/objects/goblin4.png,./sounds/goblin.wav,./sounds/goblin.wav
+2568502256,,./sounds/battleMusic.wav,./sounds/battleMusic.wav
+1774926320,,./sounds/theUnderdark.wav,./sounds/theUnderdark.wav

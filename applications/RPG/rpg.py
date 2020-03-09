@@ -7,14 +7,55 @@ rfgrid = rfgridInit()
 rfgrid.updateMenu("Initializing Grid:\nPlease Wait...",40,(0,0,0),(255,255,255))
 rfgridSerial = rfgridCommInit(rfgrid.grid_x_tiles, rfgrid.grid_y_tiles)
 done = False
+numPlayers = 4
+currentPlayer = 0
+playerNames = ["Verrona","Udoghast","Lud","Rugren"]
+id = 0
+x = 0
+y = 0
+MUTE = 3910286320
+END_TURN = 695941360
+EXPLORE = 2311927792
 
 while not done:
 	if (rfgridSerial.inWaiting() > 0):
 		# there is data in the serial buffer
 		# extract the command byte, and the arguments from the buffer
 		cmdIdx, args = rx_rfgrid(rfgridSerial)
-		rfgrid.updateMenu("rfgrid - rpg",60,(0,0,0),(100,100,100))
-		RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+		if cmdIdx == 7:
+			rfgrid.updateMenu("rfgrid - rpg",60,(0,0,0),(100,100,100))
+		if cmdIdx == 0:
+			id, x, y = RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+			if id == MUTE:
+				pygame.mixer.fadeout(5000)
+			elif id == END_TURN:
+				if currentPlayer == numPlayers:
+					rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
+					currentPlayer = 0
+				else:
+					msg = ("%s's Turn:" % (playerNames[currentPlayer]))
+					rfgrid.updateMenu(msg,40,(0,0,0),(100,100,100))
+					rfgrid.moveCameraToTag(currentPlayer)
+					currentPlayer += 1
+			elif id == EXPLORE:
+				if(x == 0):
+					# object detected on left Edge
+					for i in range(0,4):
+						rfgrid.scrollBackground(+1,0,smooth = True, speed = 20)
+				if(x == 7):
+					# object detected on right edge
+					for i in range(0,4):
+						rfgrid.scrollBackground(-1,0,smooth = True, speed = 20)
+				if(y == 0):
+					# object detected on top edge
+					for i in range(0,4):
+						rfgrid.scrollBackground(0,+1,smooth = True, speed = 20)
+				if(y == 7):
+					# object detected on bottom edge
+					for i in range(0,4):
+						rfgrid.scrollBackground(0,-1,smooth = True, speed = 20)
+		else:
+			RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
 
 	for event in pygame.event.get():
 		# IF USER CLOSES THE WINDOW
@@ -35,6 +76,21 @@ while not done:
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
 			rfgrid.scrollBackground(0,-1, smooth = False)
 
+
+		if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+			if currentPlayer == numPlayers:
+				rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
+				currentPlayer = 0
+			else:
+				msg = ("%s's Turn:" % (playerNames[currentPlayer]))
+				rfgrid.updateMenu(msg,40,(0,0,0),(100,100,100))
+				rfgrid.moveCameraToTag(currentPlayer)
+				currentPlayer += 1
+		
+		if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
+			rfgrid.ignore_zero_ids = not rfgrid.ignore_zero_ids
+			rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
+		
 		# Pressing a will simulate a random tag event, at a random x,y coordinate
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
 			x = int(numpy.random.randint(0,8))

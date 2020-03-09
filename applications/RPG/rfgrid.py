@@ -261,7 +261,7 @@ class Grid():
 		
 		# Create a tile matrix corresponding to the size of the background initialized to zero
 		self.game_tiles = createTiles(bg_x_tiles,bg_y_tiles)
-		
+		self.ignore_zero_ids = True
 
 		# Create Audio channels for each tag
 		self.audioChannels = []
@@ -424,3 +424,28 @@ class Grid():
 				if(self.game_tiles[x,y] == index):
 					self.game_tiles[x,y] = -1
 		self.game_tiles[x0+grid_x,y0+grid_y] = index
+		
+	def moveCameraToTag(self,index):
+		cam_x = int(round(abs(self.bg_ofs_x)/self.grid_x_step))
+		cam_y = int(round(abs(self.bg_ofs_y)/self.grid_y_step))
+		tag_x = 0
+		tag_y = 0
+		for x in range(0,self.bg_x_tiles):
+			for y in range(0,self.bg_y_tiles):
+				if(self.game_tiles[x,y] == index):
+					tag_x = x
+					tag_y = y
+					break
+		if tag_x - 4> cam_x:
+			for i in range(0,(tag_x-4)-cam_x):
+				self.scrollBackground(-1,0,smooth = True, speed = 20)
+		elif tag_x -4< cam_x:
+			for i in range(0,cam_x-(tag_x-4)):
+				self.scrollBackground(+1,0,smooth = True, speed = 20)
+		if tag_y -4> cam_y:
+			for i in range(0,(tag_y-4)-cam_y):
+				rfgrid.scrollBackground(0,-1,smooth = True,speed = 20)
+		elif tag_y -4 < cam_y:
+			for i in range(0,cam_y-(tag_y-4)):
+				rfgrid.scrollBackground(0,+1,smooth = True,speed = 20)
+			

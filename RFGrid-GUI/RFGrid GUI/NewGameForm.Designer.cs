@@ -39,13 +39,13 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(84)))), ((int)(((byte)(101)))));
+            this.groupBox4.BackColor = System.Drawing.SystemColors.Control;
             this.groupBox4.Controls.Add(this.label2);
             this.groupBox4.Controls.Add(this.createNewGameButton);
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Controls.Add(this.applicationFolderTextBox);
             this.groupBox4.Font = new System.Drawing.Font("Century Gothic", 9.75F);
-            this.groupBox4.ForeColor = System.Drawing.Color.White;
+            this.groupBox4.ForeColor = System.Drawing.Color.Black;
             this.groupBox4.Location = new System.Drawing.Point(12, 4);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(383, 193);
@@ -56,6 +56,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.Color.Black;
             this.label2.Location = new System.Drawing.Point(50, 92);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 17);
@@ -64,21 +65,22 @@
             // 
             // createNewGameButton
             // 
-            this.createNewGameButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(241)))), ((int)(((byte)(187)))));
+            this.createNewGameButton.BackColor = System.Drawing.SystemColors.Control;
             this.createNewGameButton.Font = new System.Drawing.Font("Century Gothic", 9.75F);
-            this.createNewGameButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(61)))), ((int)(((byte)(64)))), ((int)(((byte)(71)))));
+            this.createNewGameButton.ForeColor = System.Drawing.SystemColors.ControlText;
             this.createNewGameButton.Location = new System.Drawing.Point(149, 145);
             this.createNewGameButton.Name = "createNewGameButton";
             this.createNewGameButton.Size = new System.Drawing.Size(75, 23);
             this.createNewGameButton.TabIndex = 21;
             this.createNewGameButton.Text = "Create";
-            this.createNewGameButton.UseVisualStyleBackColor = false;
+            this.createNewGameButton.UseVisualStyleBackColor = true;
             this.createNewGameButton.Click += new System.EventHandler(this.CreateNewGameButton_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Black;
             this.label1.Location = new System.Drawing.Point(49, 48);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(292, 21);
@@ -96,7 +98,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(84)))), ((int)(((byte)(101)))));
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(407, 209);
             this.Controls.Add(this.groupBox4);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;

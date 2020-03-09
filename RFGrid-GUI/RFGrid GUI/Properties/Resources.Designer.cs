@@ -63,9 +63,19 @@ namespace RFGrid_GUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap im {
+        internal static System.Drawing.Bitmap defaultPicture {
             get {
-                object obj = ResourceManager.GetObject("im", resourceCulture);
+                object obj = ResourceManager.GetObject("defaultPicture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap defaultTokenImage {
+            get {
+                object obj = ResourceManager.GetObject("defaultTokenImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

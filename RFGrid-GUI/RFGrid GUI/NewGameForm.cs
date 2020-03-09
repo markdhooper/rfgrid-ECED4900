@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RFGrid_GUI
@@ -24,14 +17,13 @@ namespace RFGrid_GUI
         {
             string sourceFolder = (System.IO.Directory.GetCurrentDirectory() + @"\applications\defaultAssets\");
             string newFolderPath = System.IO.Directory.GetCurrentDirectory() + @"\applications\" + applicationFolderTextBox.Text;
-            if (applicationFolderTextBox.Text != null)
+            if (applicationFolderTextBox.Text.Length != 0)
             {
                 if (!System.IO.Directory.Exists(newFolderPath))
                 {
-                    System.IO.Directory.CreateDirectory(newFolderPath);
                     if (System.IO.Directory.Exists(sourceFolder))
                     {
-
+                        System.IO.Directory.CreateDirectory(newFolderPath);
                         _mainForm.DirectoryCopy(sourceFolder, newFolderPath);
                         System.IO.File.Move((System.IO.Directory.GetCurrentDirectory() + @"\applications\" + applicationFolderTextBox.Text + @"\rfgridGame.py"),
                             (System.IO.Directory.GetCurrentDirectory() + @"\applications\" + applicationFolderTextBox.Text + @"\" + applicationFolderTextBox.Text + ".py"));

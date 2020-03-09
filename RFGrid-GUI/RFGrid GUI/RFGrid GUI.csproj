@@ -8,11 +8,10 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>RFGrid_GUI</RootNamespace>
     <AssemblyName>RFGrid GUI</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -104,9 +103,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\im.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Resources\default.jpg" />
+    <None Include="Resources\mage.png" />
     <Content Include="rfid-tag-icon-18-256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

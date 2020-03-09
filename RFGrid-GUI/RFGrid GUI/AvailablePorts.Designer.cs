@@ -48,7 +48,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.ForeColor = System.Drawing.Color.Black;
             this.label1.Location = new System.Drawing.Point(18, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(118, 20);
@@ -57,37 +57,35 @@
             // 
             // refreshButton
             // 
-            this.refreshButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(54)))), ((int)(((byte)(67)))));
+            this.refreshButton.BackColor = System.Drawing.SystemColors.Control;
             this.refreshButton.FlatAppearance.BorderSize = 0;
-            this.refreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.refreshButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(241)))), ((int)(((byte)(187)))));
+            this.refreshButton.ForeColor = System.Drawing.SystemColors.ControlText;
             this.refreshButton.Location = new System.Drawing.Point(254, 39);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(75, 23);
             this.refreshButton.TabIndex = 2;
             this.refreshButton.Text = "Refresh";
-            this.refreshButton.UseVisualStyleBackColor = false;
+            this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
             // 
             // saveButtonPorts
             // 
-            this.saveButtonPorts.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(54)))), ((int)(((byte)(67)))));
+            this.saveButtonPorts.BackColor = System.Drawing.SystemColors.Control;
             this.saveButtonPorts.FlatAppearance.BorderSize = 0;
-            this.saveButtonPorts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.saveButtonPorts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(241)))), ((int)(((byte)(187)))));
+            this.saveButtonPorts.ForeColor = System.Drawing.SystemColors.ControlText;
             this.saveButtonPorts.Location = new System.Drawing.Point(136, 204);
             this.saveButtonPorts.Name = "saveButtonPorts";
             this.saveButtonPorts.Size = new System.Drawing.Size(75, 23);
             this.saveButtonPorts.TabIndex = 3;
             this.saveButtonPorts.Text = "Save";
-            this.saveButtonPorts.UseVisualStyleBackColor = false;
+            this.saveButtonPorts.UseVisualStyleBackColor = true;
             this.saveButtonPorts.Click += new System.EventHandler(this.SaveButtonPorts_Click);
             // 
             // AvailablePorts
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(84)))), ((int)(((byte)(101)))));
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(341, 249);
             this.Controls.Add(this.saveButtonPorts);
             this.Controls.Add(this.refreshButton);

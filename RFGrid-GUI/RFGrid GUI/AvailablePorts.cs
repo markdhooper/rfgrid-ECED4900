@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO.Ports;
 using System.Management;
+using System.Windows.Forms;
 
 namespace RFGrid_GUI
 {
     public partial class AvailablePorts : Form
     {
-        
+
         public AvailablePorts()
         {
-            
+
             InitializeComponent();
 
         }
@@ -51,13 +43,14 @@ namespace RFGrid_GUI
                     string desc = item["Description"].ToString();
                     string deviceId = item["DeviceID"].ToString();
 
-                    if (desc.Contains("Arduino")){
+                    if (desc.Contains("Arduino"))
+                    {
                         PortList.Items.Add(desc + " " + deviceId);
                     }
-                    
+
 
                 }
-                if(PortList.Items.Count == EMPTY)
+                if (PortList.Items.Count == EMPTY)
                 {
                     string info = "No Arduino COM Port Found.";
                     System.Windows.Forms.MessageBox.Show(info, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -87,5 +80,5 @@ namespace RFGrid_GUI
 
 
 }
- 
+
 

@@ -8,16 +8,22 @@ namespace RFGrid_GUI
 {
     public partial class MainWindow : Form
     {
+        //Globals
         string selectedGameGlobal = "";
         SerialPort serialPort = new SerialPort();
+        System.Media.SoundPlayer player = new System.Media.SoundPlayer();
         const int dispCalib = 1;
         const int backgroundCalib = 2;
         const int launch = 3;
+
+        string original_dir = Directory.GetCurrentDirectory();
+        const int RX_UPDATE = 0x00;
+        const int RX_SYNC = 0x0F;
+
         public MainWindow()
         {
-            //this.BackgroundImage = Properties.Resources.im; #disable until we find a better background image
             InitializeComponent();
-
+            backgroundCalibPictureBox.Image = Properties.Resources.defaultPicture;
             ApplicationsRefreshButton_Click(null, new EventArgs());
 
         }
@@ -36,6 +42,7 @@ namespace RFGrid_GUI
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 imageTextBox.Text = openFileDialog1.FileName;
+                tagCreatorPreviewBox.ImageLocation = imageTextBox.Text;
             }
 
         }
@@ -94,7 +101,6 @@ namespace RFGrid_GUI
                 {
                     if (File.Exists(path))
                     {
-                        //Really ugly way of checking if the id was already in the tags.rfgridtag.
                         //Have to go through the file and read every line.
                         //Then if it exists, edit that line and re-write the file.
                         //Otherwise, it is a new ID and just append it to the file.
@@ -122,11 +128,11 @@ namespace RFGrid_GUI
                         System.IO.File.WriteAllText(path, data + Environment.NewLine);
 
                     }
-                    if (soundTextBox.Text != "")
+                    if (soundTextBox.Text != "" && !File.Exists(objects_path + Path.GetFileName(soundTextBox.Text)))
                         System.IO.File.Copy(soundTextBox.Text, sounds_path + Path.GetFileName(soundTextBox.Text), true);
-                    if (secondSoundTextBox.Text != "")
+                    if (secondSoundTextBox.Text != "" && !File.Exists(objects_path + Path.GetFileName(secondSoundTextBox.Text)))
                         System.IO.File.Copy(secondSoundTextBox.Text, sounds_path + Path.GetFileName(secondSoundTextBox.Text), true);
-                    if (imageTextBox.Text != "")
+                    if (imageTextBox.Text != "" && !File.Exists(objects_path + Path.GetFileName(imageTextBox.Text)))
                         System.IO.File.Copy(imageTextBox.Text, objects_path + Path.GetFileName(imageTextBox.Text), true);
                     System.Windows.Forms.MessageBox.Show("Tag is sucessfully created.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
@@ -134,6 +140,7 @@ namespace RFGrid_GUI
                     "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
+            loadTagInfo();
         }
 
         private void ClearButton_Click(object sender, EventArgs e)
@@ -141,7 +148,7 @@ namespace RFGrid_GUI
             tagBox.Text = null;
             imageTextBox.Text = null;
             soundTextBox.Text = null;
-            secondSoundButton.Text = null;
+            secondSoundTextBox.Text = null;
         }
 
         private void SoundButton_Click(object sender, EventArgs e)
@@ -178,11 +185,12 @@ namespace RFGrid_GUI
             System.Windows.Forms.MessageBox.Show("rfgrid device dimensions.\nExample: 4x4, 8x8, 12x12,16x16.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        string original_dir = Directory.GetCurrentDirectory();
+
+        
 
         private void DispCalibrateButton_Click(object sender, EventArgs e)
         {
-            if (loadedConfigurationLabel.Text != "NA")
+            if (loadedConfigurationLabel.Text != "N/A")
             {
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
                 string filePath = "rfgridDispCalib.py";
@@ -208,7 +216,7 @@ namespace RFGrid_GUI
                     "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            /* Using threading so multi-tasking is possible while installing modules.*/
+            /* Multi-tasking is possible while installing modules.*/
             System.Threading.Thread workerThread = new System.Threading.Thread(
                 new System.Threading.ThreadStart(() =>
                 {
@@ -292,12 +300,14 @@ namespace RFGrid_GUI
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 backgroundImgTextBox.Text = openFileDialog1.FileName;
+                backgroundCalibPictureBox.ImageLocation = backgroundImgTextBox.Text;
+                backgroundCalibPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
             }
         }
 
         private void BackgroundCalibButton_Click(object sender, EventArgs e)
         {
-            if (loadedConfigurationLabel.Text != "NA")
+            if (loadedConfigurationLabel.Text != "N/A")
             {
                 string filePath = "rfgridBackgroundCalib.py";
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
@@ -344,8 +354,7 @@ namespace RFGrid_GUI
 
 
 
-        const int RX_UPDATE = 0x00;
-        const int RX_SYNC = 0x0F;
+
         private void TagGetIdButton_Click(object sender, EventArgs e)
         {
 
@@ -356,6 +365,9 @@ namespace RFGrid_GUI
                     dispCalibXBox.Text = "8";
                     dispCalibYBox.Text = "8";
                 }
+                string info = "Place the tag on the 0,0 tile.(top left)\n\n" +
+              "You do not need to click this button again to scan a tag.";
+                System.Windows.Forms.MessageBox.Show(info, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
                 string[] arr = portTextLabel.Text.Split(' ');
@@ -480,7 +492,7 @@ namespace RFGrid_GUI
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("Cannot locate Applications Folder",
+                System.Windows.Forms.MessageBox.Show("Applications folder not found",
                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
@@ -526,14 +538,57 @@ namespace RFGrid_GUI
         }
 
 
+
         private void openExistingApplicationButton_Click(object sender, EventArgs e)
         {
-
-            /* SELF NOTE *** NEED TO MAKE SURE ESSENTIAL FILES EXIST IN THE DIRECTORY *** */
             selectedGameGlobal = ApplicationsList.GetItemText(ApplicationsList.SelectedItem);
             DialogResult result = System.Windows.Forms.MessageBox.Show("Application " + "\"" + selectedGameGlobal + "\"" + " is sucessfully loaded.",
       "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             loadedConfigurationLabel.Text = selectedGameGlobal;
+            backgroundCalibPictureBox.ImageLocation = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal + "\\images\\backgrounds\\default.jpg";
+            loadTagInfo();
+
+        }
+
+        private void loadTagInfo()
+        {
+            string tagConfigPath = original_dir + @"\applications\" + selectedGameGlobal + @"\configs\tags.rfgridtag";
+            tagInfoListView.Items.Clear();
+            if (File.Exists(tagConfigPath))
+            {
+
+                int i = 0;
+                ImageList imgs = new ImageList();
+                imgs.ImageSize = new System.Drawing.Size(40, 40);
+                tagInfoListView.SmallImageList = imgs;
+
+                string[] lines = System.IO.File.ReadAllLines(tagConfigPath);
+                foreach (string line in lines)
+                {
+                    var parsed_line = line.Split(',');
+                    string[] imageName = Path.GetFileName(parsed_line[1]).Split('.');
+                    string[] entranceSoundName = Path.GetFileName(parsed_line[2]).Split('.');
+                    string[] updateSoundName = Path.GetFileName(parsed_line[3]).Split('.');
+                    parsed_line[1] = imageName[0];
+                    parsed_line[2] = entranceSoundName[0];
+                    parsed_line[3] = updateSoundName[0];
+
+                    if (parsed_line[1].Length != 0) 
+                    {
+                        imgs.Images.Add(parsed_line[1], System.Drawing.Image.FromFile(original_dir + @"\applications\" + selectedGameGlobal + @"\images\objects\" + imageName[0] + ".png"));
+                        tagInfoListView.Items.Add(new ListViewItem(parsed_line) { ImageIndex = i });
+                        i++;
+
+                    }
+                    else
+                    {
+                        tagInfoListView.Items.Add(new ListViewItem(parsed_line));
+                    }
+
+                }
+
+
+            }
         }
 
         private void SecondSoundButton_Click(object sender, EventArgs e)
@@ -561,8 +616,15 @@ namespace RFGrid_GUI
             {
                 DeleteFolder(selected_path);
                 result = System.Windows.Forms.MessageBox.Show("Application " + "\"" + selected + "\"" + "is sucessfully deleted.",
-                       "Information", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                if (result == DialogResult.OK) ApplicationsRefreshButton_Click(DeleteApplicationButton, e);
+                       "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (result == DialogResult.OK)
+                {
+                    ApplicationsRefreshButton_Click(DeleteApplicationButton, e);
+                    tagInfoListView.Items.Clear();
+                    selectedGameGlobal = "N/A";
+                    loadedConfigurationLabel.Text = selectedGameGlobal;
+
+                }
             }
 
         }
@@ -586,7 +648,7 @@ namespace RFGrid_GUI
 
         private void LaunchButton_Click(object sender, EventArgs e)
         {
-            if (loadedConfigurationLabel.Text != "NA")
+            if (loadedConfigurationLabel.Text != "N/A")
             {
                 serialPort.Close();
                 string filePath = Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal;
@@ -621,6 +683,66 @@ namespace RFGrid_GUI
             {
                 e.Handled = true;
             }
+        }
+
+        private void EntranceSoundPlayButton_Click(object sender, EventArgs e)
+        {
+            string sound_path = soundTextBox.Text;
+            if (File.Exists(sound_path))
+            {
+                player.SoundLocation = (sound_path);
+                player.Play();
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Sound file not found.",
+                    "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void UpdateSoundPlayButton_Click(object sender, EventArgs e)
+        {
+            string sound_path = secondSoundTextBox.Text;
+            if (File.Exists(sound_path))
+            {
+                player.SoundLocation = (sound_path);
+                player.Play();
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Sound file not found.",
+                    "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TagInfoListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            if (tagInfoListView.SelectedItems.Count > 0)
+            {
+                tagBox.Text = tagInfoListView.SelectedItems[0].Text;
+                if (tagInfoListView.SelectedItems[0].SubItems[2].Text.Length != 0)
+                {
+                    soundTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\sounds\" + tagInfoListView.SelectedItems[0].SubItems[2].Text + ".wav";
+                }
+                else
+                {
+                    soundTextBox.Text = " ";
+                }
+                if (tagInfoListView.SelectedItems[0].SubItems[3].Text.Length != 0)
+                {
+                    secondSoundTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\sounds\" + tagInfoListView.SelectedItems[0].SubItems[3].Text + ".wav";
+                }
+                else
+                {
+                    secondSoundTextBox.Text = " ";
+                }
+            }
+        }
+
+        private void StopPlayingButton_Click(object sender, EventArgs e)
+        {
+            player.Stop();
         }
     }
 }

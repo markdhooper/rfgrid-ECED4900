@@ -1,0 +1,13 @@
+There is an issue when loading my rpg(non-communicating) game. 
+
+I fixed the launch by renaming rfgridNOCOMM.py to rpg(non-communicating).py
+I also had to comment out the include statement for the rfgridCommunication module as it was throwing because I didn't have the 
+serial.tools included or something..
+
+Also: 
+
+I can't modify the background, or the grid on a game that already exists because it's looking for /application/8x8. This 
+is a bug in where the directory is. My problem was that the config file was messed up for my game. So I ended up having to
+run the calibration tool using the python script instead of the .exe. That seemed to get it working. 
+
+Anyway, just thought i'd document this here. 

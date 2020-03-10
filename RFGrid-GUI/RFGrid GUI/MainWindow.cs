@@ -721,6 +721,19 @@ namespace RFGrid_GUI
             if (tagInfoListView.SelectedItems.Count > 0)
             {
                 tagBox.Text = tagInfoListView.SelectedItems[0].Text;
+
+                if (tagInfoListView.SelectedItems[0].SubItems[1].Text.Length != 0)
+                {
+                    imageTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\images\objects\" + tagInfoListView.SelectedItems[0].SubItems[1].Text + ".png";
+                    tagCreatorPreviewBox.ImageLocation = imageTextBox.Text;
+
+                }
+                else
+                {
+                    soundTextBox.Text = " ";
+                }
+
+
                 if (tagInfoListView.SelectedItems[0].SubItems[2].Text.Length != 0)
                 {
                     soundTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\sounds\" + tagInfoListView.SelectedItems[0].SubItems[2].Text + ".wav";

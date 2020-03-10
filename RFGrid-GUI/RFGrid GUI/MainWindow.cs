@@ -313,7 +313,7 @@ namespace RFGrid_GUI
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
                 if (backgroundImgTextBox.Text == "default.jpg")
                 {
-                    ; //do nothing..
+                    ; //do nothing..//test
                 }
                 else
                 {

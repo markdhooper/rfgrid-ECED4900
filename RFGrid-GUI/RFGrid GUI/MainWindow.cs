@@ -320,7 +320,7 @@ namespace RFGrid_GUI
 
                     string backgrounds_path = Directory.GetCurrentDirectory() + "\\images\\backgrounds\\";
 
-                    if (File.Exists(backgroundImgTextBox.Text))
+                    if (File.Exists(backgroundImgTextBox.Text) && !File.Exists(backgrounds_path + Path.GetFileName(backgroundImgTextBox.Text)))
                     {
                         System.IO.File.Copy(backgroundImgTextBox.Text, backgrounds_path + "default.jpg", true);
 

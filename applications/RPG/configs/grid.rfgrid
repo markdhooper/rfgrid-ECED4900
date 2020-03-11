@@ -1,0 +1,10 @@
+scr_w=1024
+scr_h=768
+g_w=497
+g_h=504
+g_x=270
+g_y=180
+g_x_step=62
+g_y_step=63
+g_x_tiles=8
+g_y_tiles=8

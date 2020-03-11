@@ -176,22 +176,22 @@ def rx_update(args,rfgrid):
 			if(rfgrid.tags[index][0]):
 				rfgrid.draw()
 			rfgrid.playTagSound(index)
-			if rfgrid.tags[index][1]:
+			if rfgrid.tags[index][1] and rfgrid.scroll_enabled:
 				if(x == 0):
 					# object detected on left Edge
-					for i in range(0,3):
+					for i in range(0,4):
 						rfgrid.scrollBackground(+1,0,smooth = True)
 				if(x == 7):
 					# object detected on right edge
-					for i in range(0,3):
+					for i in range(0,4):
 						rfgrid.scrollBackground(-1,0,smooth = True)
 				if(y == 0):
 					# object detected on top edge
-					for i in range(0,3):
+					for i in range(0,4):
 						rfgrid.scrollBackground(0,+1,smooth = True)
 				if(y == 7):
 					# object detected on bottom edge
-					for i in range(0,3):
+					for i in range(0,4):
 						rfgrid.scrollBackground(0,-1,smooth = True)
 	elif not rfgrid.ignore_zero_ids:
 		x0 = int(round(abs(rfgrid.bg_ofs_x)/rfgrid.grid_x_step))

@@ -1,4 +1,0 @@
-Graph Paper Maker: https://incompetech.com/graphpaper/lite/
-
-Convert PDF's to .png files: https://pdf2png.com/
-

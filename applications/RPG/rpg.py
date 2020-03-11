@@ -1,7 +1,6 @@
 from rfgrid import *
 from rfgridCommunication import *
 from time import sleep
-import numpy
 
 rfgrid = rfgridInit()
 rfgrid.updateMenu("Initializing Grid:\nPlease Wait...",40,(0,0,0),(255,255,255))
@@ -13,9 +12,15 @@ playerNames = ["Verrona","Udoghast","Lud","Rugren"]
 id = 0
 x = 0
 y = 0
-MUTE = 3910286320
+
+# THESE ARE SPECIFIC TO rpg.py
+MUTE = 2302950640
 END_TURN = 695941360
 EXPLORE = 2311927792
+SCROLL_OFF = 963853040 
+SCROLL_ON = 2307276272
+MENU_COLOR = (200,200,200)
+
 
 while not done:
 	if (rfgridSerial.inWaiting() > 0):
@@ -23,37 +28,76 @@ while not done:
 		# extract the command byte, and the arguments from the buffer
 		cmdIdx, args = rx_rfgrid(rfgridSerial)
 		if cmdIdx == 7:
-			rfgrid.updateMenu("rfgrid - rpg",60,(0,0,0),(100,100,100))
+			rfgrid.updateMenu("rfgrid - rpg",60,(0,0,0),MENU_COLOR)
 		if cmdIdx == 0:
 			id, x, y = RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
+			
+			# Mute all audio 
 			if id == MUTE:
 				pygame.mixer.fadeout(5000)
+				
+			# End the current turn and locate 
 			elif id == END_TURN:
 				if currentPlayer == numPlayers:
-					rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
+					rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),MENU_COLOR)
 					currentPlayer = 0
 				else:
+					# inform the player that it's their turn
 					msg = ("%s's Turn:" % (playerNames[currentPlayer]))
-					rfgrid.updateMenu(msg,40,(0,0,0),(100,100,100))
+					rfgrid.updateMenu(msg,40,(0,0,0),MENU_COLOR)
+					# attempt to pan the map to display that character
 					rfgrid.moveCameraToTag(currentPlayer)
 					currentPlayer += 1
+					
+			# Enable background scrolling for tags with renderable images
+			elif id == SCROLL_ON:
+				rfgrid.scroll_enabled = True
+				MENU_COLOR = (200,200,200)
+				msg = "\n Character Scrolling ENABLED"
+				rfgrid.updateMenu(msg,30,(0,0,0),MENU_COLOR)
+			
+			# Disable background scrolling for tags with renderable images
+			elif id == SCROLL_OFF:
+				rfgrid.scroll_enabled = False
+				MENU_COLOR = (200,100,100)
+				msg = "\n Character Scrolling DISABLED"
+				rfgrid.updateMenu(msg,30,(255,0,0),MENU_COLOR)
+			
 			elif id == EXPLORE:
+				step_size = 0
+				x_dir = 0
+				y_dir = 0
+				
+				# x cases
 				if(x == 0):
-					# object detected on left Edge
-					for i in range(0,4):
-						rfgrid.scrollBackground(+1,0,smooth = True, speed = 20)
-				if(x == 7):
-					# object detected on right edge
-					for i in range(0,4):
-						rfgrid.scrollBackground(-1,0,smooth = True, speed = 20)
+					step_size = 7
+					x_dir = 1
+				elif(x == 1):
+					step_size = 2
+					x_dir = 1
+				elif(x == 7):
+					step_size = 7
+					x_dir = -1
+				elif(x == 6):
+					step_size = 2
+					x_dir = -1
+				
+				# y cases
 				if(y == 0):
-					# object detected on top edge
-					for i in range(0,4):
-						rfgrid.scrollBackground(0,+1,smooth = True, speed = 20)
-				if(y == 7):
-					# object detected on bottom edge
-					for i in range(0,4):
-						rfgrid.scrollBackground(0,-1,smooth = True, speed = 20)
+					step_size = 7
+					y_dir = 1
+				elif(y == 1):
+					step_size = 2
+					y_dir = 1
+				elif(y == 7):
+					step_size = 7
+					y_dir = -1
+				elif(y == 6):
+					step_size = 2
+					y_dir = -1
+						
+				for i in range(0,step_size):
+					rfgrid.scrollBackground(x_dir,y_dir,smooth = True, speed = 20)
 		else:
 			RX_LUT[RX_LUT_KEYS[cmdIdx]](args,rfgrid)
 
@@ -75,48 +119,6 @@ while not done:
 			rfgrid.scrollBackground(0,+1,smooth = False)
 		elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
 			rfgrid.scrollBackground(0,-1, smooth = False)
-
-
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-			if currentPlayer == numPlayers:
-				rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
-				currentPlayer = 0
-			else:
-				msg = ("%s's Turn:" % (playerNames[currentPlayer]))
-				rfgrid.updateMenu(msg,40,(0,0,0),(100,100,100))
-				rfgrid.moveCameraToTag(currentPlayer)
-				currentPlayer += 1
-		
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
-			rfgrid.ignore_zero_ids = not rfgrid.ignore_zero_ids
-			rfgrid.updateMenu("Dungeon Master's Turn",40,(0,0,0),(100,100,100))
-		
-		# Pressing a will simulate a random tag event, at a random x,y coordinate
-		if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
-			x = int(numpy.random.randint(0,8))
-			y = int(numpy.random.randint(0,8))
-			id = rfgrid.tags[numpy.random.randint(0,rfgrid.tag_count)][0]
-			# tag search will return a valid index if the ID sent is
-			# within the tags.rfgridtag file
-			index = tagSearch(rfgrid.tags,id)
-			if index != -1:
-				rfgrid.updateGridTiles(x,y,index)
-				if(rfgrid.tags[index][0]):
-					rfgrid.draw()
-				rfgrid.playTagSound(index)
-				if rfgrid.tags[index][1]:
-					if(x == 0):
-						# object detected on left Edge
-						rfgrid.scrollBackground(+2,0,smooth = True)
-					if(x == 7):
-						# object detected on right edge
-						rfgrid.scrollBackground(-2,0,smooth = True)
-					if(y == 0):
-						# object detected on top edge
-						rfgrid.scrollBackground(0,+2,smooth = True)
-					if(y == 7):
-						# object detected on bottom edge
-						rfgrid.scrollBackground(0,-2,smooth = True)
 	
 	clock.tick(20)
 pygame.quit()

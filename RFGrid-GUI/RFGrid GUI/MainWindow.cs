@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Windows.Forms;
 
 
+
 namespace RFGrid_GUI
 {
     public partial class MainWindow : Form
@@ -357,7 +358,7 @@ namespace RFGrid_GUI
 
         private void TagGetIdButton_Click(object sender, EventArgs e)
         {
-
+            AvailablePorts instance = new AvailablePorts(this);
             if (portTextLabel.Text != "NA")
             {
                 if ((dispCalibXBox.Text == "") && (dispCalibYBox.Text == ""))
@@ -396,8 +397,10 @@ namespace RFGrid_GUI
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("No COM Port is Selected.",
-                   "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                instance.getAvailablePorts();
+                TagGetIdButton_Click(sender,e);
+
+                
             }
 
         }
@@ -730,7 +733,9 @@ namespace RFGrid_GUI
                 }
                 else
                 {
-                    soundTextBox.Text = " ";
+                    imageTextBox.Text = " ";
+                    tagCreatorPreviewBox.Image = null;
+
                 }
 
 

@@ -47,11 +47,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Black;
             this.label1.Location = new System.Drawing.Point(18, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(118, 20);
+            this.label1.Size = new System.Drawing.Size(105, 18);
             this.label1.TabIndex = 1;
             this.label1.Text = "Available Ports";
             // 
@@ -104,11 +104,9 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.ListBox PortList;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Button saveButtonPorts;
-       
+        public System.Windows.Forms.ListBox PortList;
     }
 }

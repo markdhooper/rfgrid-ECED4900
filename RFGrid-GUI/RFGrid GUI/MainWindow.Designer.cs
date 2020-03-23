@@ -429,20 +429,20 @@
             // 
             // aboutToolStripMenuItem
             // 
-            this.aboutToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(84)))), ((int)(((byte)(101)))));
+            this.aboutToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             this.aboutToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.aboutToolStripMenuItem.ForeColor = System.Drawing.Color.White;
+            this.aboutToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
-            this.exitToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(81)))), ((int)(((byte)(84)))), ((int)(((byte)(101)))));
-            this.exitToolStripMenuItem.ForeColor = System.Drawing.Color.White;
+            this.exitToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
+            this.exitToolStripMenuItem.ForeColor = System.Drawing.Color.Black;
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 

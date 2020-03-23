@@ -248,7 +248,7 @@ namespace RFGrid_GUI
 
         private void run_cmd(string cmd, string args, int type)
         {
-
+            //Run python file using the python.exe from embeddable python package.
             string result;
 
             System.Diagnostics.ProcessStartInfo start = new System.Diagnostics.ProcessStartInfo();

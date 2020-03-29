@@ -150,6 +150,7 @@ namespace RFGrid_GUI
             imageTextBox.Text = null;
             soundTextBox.Text = null;
             secondSoundTextBox.Text = null;
+            tagCreatorPreviewBox.Image = null;
         }
 
         private void SoundButton_Click(object sender, EventArgs e)

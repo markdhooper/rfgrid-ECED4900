@@ -57,12 +57,9 @@ namespace RFGrid_GUI
                 }
                 else
                 {
-                    if (PortList.Items.Count != 0)
-                    {
-                        this.PortList.SelectedIndex = 0;
-                        this.mainForm.LabelText = (PortList.GetItemText(PortList.SelectedItem));
-                        mainForm.Text = mainForm.LabelText;
-                    }
+                    this.PortList.SelectedIndex = 0;
+                    this.mainForm.LabelText = (PortList.GetItemText(PortList.SelectedItem));
+                    mainForm.Text = mainForm.LabelText;
                 }
 
             }

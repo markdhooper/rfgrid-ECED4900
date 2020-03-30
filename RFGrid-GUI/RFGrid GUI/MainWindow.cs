@@ -399,7 +399,10 @@ namespace RFGrid_GUI
             else
             {
                 instance.getAvailablePorts();
-                TagGetIdButton_Click(sender,e);
+                if (portTextLabel.Text != "NA")
+                {
+                    TagGetIdButton_Click(sender, e);
+                }
 
                 
             }

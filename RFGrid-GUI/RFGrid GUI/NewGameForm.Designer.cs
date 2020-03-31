@@ -44,7 +44,7 @@
             this.groupBox4.Controls.Add(this.createNewGameButton);
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Controls.Add(this.applicationFolderTextBox);
-            this.groupBox4.Font = new System.Drawing.Font("Century Gothic", 9.75F);
+            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
             this.groupBox4.ForeColor = System.Drawing.Color.Black;
             this.groupBox4.Location = new System.Drawing.Point(12, 4);
             this.groupBox4.Name = "groupBox4";
@@ -59,14 +59,14 @@
             this.label2.ForeColor = System.Drawing.Color.Black;
             this.label2.Location = new System.Drawing.Point(50, 92);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 17);
+            this.label2.Size = new System.Drawing.Size(51, 16);
             this.label2.TabIndex = 22;
             this.label2.Text = "Name :";
             // 
             // createNewGameButton
             // 
             this.createNewGameButton.BackColor = System.Drawing.SystemColors.Control;
-            this.createNewGameButton.Font = new System.Drawing.Font("Century Gothic", 9.75F);
+            this.createNewGameButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
             this.createNewGameButton.ForeColor = System.Drawing.SystemColors.ControlText;
             this.createNewGameButton.Location = new System.Drawing.Point(149, 145);
             this.createNewGameButton.Name = "createNewGameButton";
@@ -79,11 +79,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Black;
             this.label1.Location = new System.Drawing.Point(49, 48);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(292, 21);
+            this.label1.Size = new System.Drawing.Size(263, 20);
             this.label1.TabIndex = 20;
             this.label1.Text = "Please Enter New Application Name";
             // 
@@ -91,7 +91,7 @@
             // 
             this.applicationFolderTextBox.Location = new System.Drawing.Point(110, 89);
             this.applicationFolderTextBox.Name = "applicationFolderTextBox";
-            this.applicationFolderTextBox.Size = new System.Drawing.Size(200, 23);
+            this.applicationFolderTextBox.Size = new System.Drawing.Size(200, 22);
             this.applicationFolderTextBox.TabIndex = 19;
             // 
             // NewGameForm

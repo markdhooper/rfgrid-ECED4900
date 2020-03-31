@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Windows.Forms;
 
 
+
 namespace RFGrid_GUI
 {
     public partial class MainWindow : Form
@@ -149,6 +150,7 @@ namespace RFGrid_GUI
             imageTextBox.Text = null;
             soundTextBox.Text = null;
             secondSoundTextBox.Text = null;
+            tagCreatorPreviewBox.Image = null;
         }
 
         private void SoundButton_Click(object sender, EventArgs e)
@@ -247,7 +249,7 @@ namespace RFGrid_GUI
 
         private void run_cmd(string cmd, string args, int type)
         {
-
+            //Run python file using the python.exe from embeddable python package.
             string result;
 
             System.Diagnostics.ProcessStartInfo start = new System.Diagnostics.ProcessStartInfo();
@@ -313,14 +315,14 @@ namespace RFGrid_GUI
                 Directory.SetCurrentDirectory(Directory.GetCurrentDirectory() + "\\applications\\" + selectedGameGlobal);
                 if (backgroundImgTextBox.Text == "default.jpg")
                 {
-                    ; //do nothing..
+                    ; //do nothing..//test
                 }
                 else
                 {
 
                     string backgrounds_path = Directory.GetCurrentDirectory() + "\\images\\backgrounds\\";
 
-                    if (File.Exists(backgroundImgTextBox.Text))
+                    if (File.Exists(backgroundImgTextBox.Text) && !File.Exists(backgrounds_path + Path.GetFileName(backgroundImgTextBox.Text)))
                     {
                         System.IO.File.Copy(backgroundImgTextBox.Text, backgrounds_path + "default.jpg", true);
 
@@ -357,7 +359,7 @@ namespace RFGrid_GUI
 
         private void TagGetIdButton_Click(object sender, EventArgs e)
         {
-
+            AvailablePorts instance = new AvailablePorts(this);
             if (portTextLabel.Text != "NA")
             {
                 if ((dispCalibXBox.Text == "") && (dispCalibYBox.Text == ""))
@@ -396,8 +398,13 @@ namespace RFGrid_GUI
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("No COM Port is Selected.",
-                   "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                instance.getAvailablePorts();
+                if (portTextLabel.Text != "NA")
+                {
+                    TagGetIdButton_Click(sender, e);
+                }
+
+                
             }
 
         }
@@ -721,6 +728,21 @@ namespace RFGrid_GUI
             if (tagInfoListView.SelectedItems.Count > 0)
             {
                 tagBox.Text = tagInfoListView.SelectedItems[0].Text;
+
+                if (tagInfoListView.SelectedItems[0].SubItems[1].Text.Length != 0)
+                {
+                    imageTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\images\objects\" + tagInfoListView.SelectedItems[0].SubItems[1].Text + ".png";
+                    tagCreatorPreviewBox.ImageLocation = imageTextBox.Text;
+
+                }
+                else
+                {
+                    imageTextBox.Text = " ";
+                    tagCreatorPreviewBox.Image = null;
+
+                }
+
+
                 if (tagInfoListView.SelectedItems[0].SubItems[2].Text.Length != 0)
                 {
                     soundTextBox.Text = Directory.GetCurrentDirectory() + @"\applications\" + selectedGameGlobal + @"\sounds\" + tagInfoListView.SelectedItems[0].SubItems[2].Text + ".wav";

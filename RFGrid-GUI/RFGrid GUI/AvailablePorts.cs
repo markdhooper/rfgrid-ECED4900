@@ -21,7 +21,7 @@ namespace RFGrid_GUI
         }
 
 
-        private void RefreshButton_Click(object sender, EventArgs e)
+        private  void RefreshButton_Click(object sender, EventArgs e)
         {
             getAvailablePorts();
         }
@@ -29,7 +29,7 @@ namespace RFGrid_GUI
 
         const int EMPTY = 0;
 
-        private void getAvailablePorts()
+        public  void getAvailablePorts()
         {
             PortList.Items.Clear();
             ManagementScope connectionScope = new ManagementScope();
@@ -55,6 +55,13 @@ namespace RFGrid_GUI
                     string info = "No Arduino COM Port Found.";
                     System.Windows.Forms.MessageBox.Show(info, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+                else
+                {
+                    this.PortList.SelectedIndex = 0;
+                    this.mainForm.LabelText = (PortList.GetItemText(PortList.SelectedItem));
+                    mainForm.Text = mainForm.LabelText;
+                }
+
             }
             catch (ManagementException e)
             {

@@ -1,6 +1,9 @@
-# rfgrid
-A modular RFID based 2D grid that can detect objects equipped with RFID tags which incorporates a pico projector display.
+# rfgrid - An Interactive RFID Display
+Our (Mark Hooper & Burack Ozter) Senior Year Project as part of the Dalhousie Bachelor of Electrical Engineering Program.
 
-This will be our project as part of ECED4900 - Senior Year Project course at Dalhousie University.
+Modular arrays of RFID readers are embedded beneath a projection surface upon which a short-throw projector displays contextual visual and audio feedback based on the application running on a host machine. 
 
-This project will use modular 4x4 arrays of Mifare RC522 based RFID readers/writers interfaced with an Arduino Uno to TX/RX commands to a host machine which will run a Python based API which will create the requisite graphics and sound based on the state of the peripheral. 
+## Application Demonstrations
+[![RFGRID - RPG](http://img.youtube.com/vi/AkpBl5bfDys/0.jpg)](http://www.youtube.com/watch?v=AkpBl5bfDys)
+[![RFGRID - SEQUENCER](http://img.youtube.com/vi/AWikCM2gaQc/0.jpg)](http://www.youtube.com/watch?v=AWikCM2gaQc)
+[![RFGRID - CHESS](http://img.youtube.com/vi/Hl0dvJiLpyY/0.jpg)](http://www.youtube.com/watch?v=Hl0dvJiLpyY)
